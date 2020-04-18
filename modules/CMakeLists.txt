@@ -11,7 +11,8 @@ set (MODULES_CMP_ENABLES
 )
 
 # Setting required 3rd party dependency versions for use in modules
-set(MODULES_BOOST_VERSION 1.66)
+set(MODULES_BOOST_VERSION 1.71)
+set(MODULES_GTEST_VERSION 1.10)
 
 # Sets -fvisibility=hidden on Mac/Linux, matches Windows behaviour for exporting symbols in shared libs.
 # This also dramatically improves .dll/.so load times & file size.
