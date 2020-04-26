@@ -17,10 +17,10 @@ add_library(Epidemic ${ModuleLibType}
         include/Epidemic/World.h
 
         # Listing of all sources
-        src/Agent.h
-        src/Building.h
-        src/Community.h
-        src/World.h
+        src/Agent.cpp
+        src/Building.cpp
+        src/Community.cpp
+        src/World.cpp
         )
 
 # Defining headers that this library uses
@@ -33,13 +33,13 @@ target_include_directories(Epidemic
 # Create an export header so that we can export our interface when creating a shared library
 generate_export_header(Epidemic EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/epidemic_export.h)
 
-find_package(Boost ${MODULES_BOOST_VERSION} REQUIRED QUIET)
+#find_package(Boost ${MODULES_BOOST_VERSION} REQUIRED QUIET)
 
 # Stating dependancies
 target_link_libraries(Epidemic
       PUBLIC
       modules_public_config
-      Boost::boost
+#      Boost::boost
 
       PRIVATE
       modules_private_config
