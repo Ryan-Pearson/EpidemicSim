@@ -15,12 +15,14 @@ add_library(Epidemic ${ModuleLibType}
         include/Epidemic/Building.h
         include/Epidemic/Community.h
         include/Epidemic/World.h
+        include/Epidemic/WorldConfiguration.h
 
         # Listing of all sources
         src/Agent.cpp
         src/Building.cpp
         src/Community.cpp
         src/World.cpp
+        src/WorldConfiguration.cpp
         )
 
 # Defining headers that this library uses
