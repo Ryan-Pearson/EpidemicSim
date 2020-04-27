@@ -7,11 +7,15 @@
 
 namespace Epidemic {
 
+using AgentID = int;
+
 class Agent
 {
 public:
+   explicit Agent() noexcept;
 
 private:
+   Agent m_id;
 };
 
 } // namespace Epidemic

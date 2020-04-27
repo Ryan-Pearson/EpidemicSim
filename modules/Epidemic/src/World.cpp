@@ -2,4 +2,9 @@
 
 namespace Epidemic {
 
+World::World(const WorldConfiguration& /*config*/)
+{
+
+}
+
 } // namespace Epidemic

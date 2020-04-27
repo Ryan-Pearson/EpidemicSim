@@ -6,19 +6,24 @@
 #define EPIDEMIC_SIM_WORLD_H
 
 // STL
-#include <unordered_set>
+#include <unordered_map>
 
 // Epidemic
 #include "Agent.h"
+#include "Building.h"
+#include "Community.h"
+#include "WorldConfiguration.h"
 
 namespace Epidemic {
 
 class World
 {
 public:
+   explicit World(const WorldConfiguration& config);
 
 private:
-   std::unordered_set<Agent> m_agents;
+   std::unordered_map<CommunityID, Community> m_communities;
+   std::unordered_map<AgentID, Agent> m_agents;
 };
 
 } // namespace Epidemic
