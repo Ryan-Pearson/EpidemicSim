@@ -15,21 +15,26 @@
 
 namespace Epidemic {
 
-using CommunityID = int;
-
 class Community
 {
-public:
    using BuildingByTypeMap = std::unordered_map<Building::Type, std::vector<Building>>;
+
+public:
+   using Id = int;
+   using Type = int;
 
    explicit Community(const CommunityConfiguration& configuration) noexcept;
 
-   constexpr CommunityID getId() noexcept { return m_id; }
-   const std::vector<Building>& getBuildingsOfType(Building::Type type) const &;
+   static Type get_community_type_by_name(const std::string& name);
+
+   constexpr Id get_id() noexcept { return m_id; }
+   const std::vector<Building>& get_buildings_of_type(Building::Type type) const &;
 
 private:
-   CommunityID m_id;
+   Id m_id;
    BuildingByTypeMap m_buildings;
+
+   static std::unordered_map<std::string, Type> s_typeByName;
 };
 
 } // namespace Epidemic

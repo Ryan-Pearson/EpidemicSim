@@ -6,6 +6,11 @@ static Building::Id uniqueBuildingId = -1;
 static Building::Type uniqueBuildingType = -1;
 std::unordered_map<std::string, Building::Type> Building::s_typeByName;
 
+Building::Building(const Type type, const Position& maxPosition) noexcept :
+   m_id(++uniqueBuildingId), m_type(type), m_maxPosition(maxPosition)
+{
+}
+
 Building::Type Building::get_building_type_by_name(const std::string& name)
 {
    auto it = s_typeByName.find(name);
@@ -15,11 +20,6 @@ Building::Type Building::get_building_type_by_name(const std::string& name)
       it = emplace_ret.first;
    }
    return it->second;
-}
-
-Building::Building(const Type type, const Position& maxPosition) noexcept :
-   m_id(++uniqueBuildingId), m_type(type), m_maxPosition(maxPosition)
-{
 }
 
 } // namespace Epidemic

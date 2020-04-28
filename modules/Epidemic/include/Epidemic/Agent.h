@@ -5,17 +5,26 @@
 #ifndef EPIDEMIC_SIM_AGENT_H
 #define EPIDEMIC_SIM_AGENT_H
 
-namespace Epidemic {
+// STL
+#include <string>
+#include <unordered_map>
 
-using AgentID = int;
+namespace Epidemic {
 
 class Agent
 {
 public:
+   using Id = int;
+   using Type = int;
+
    explicit Agent() noexcept;
 
+   static Type get_agent_type_by_name(const std::string& name);
+
 private:
-   Agent m_id;
+   Id m_id;
+
+   static std::unordered_map<std::string, Type> s_typeByName;
 };
 
 } // namespace Epidemic

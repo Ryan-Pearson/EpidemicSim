@@ -27,9 +27,9 @@ public:
 
    explicit Building(Type type, const Position& maxPosition) noexcept;
 
-   constexpr Id getId() noexcept { return m_id; }
-   constexpr const Position& getMaxPosition() & noexcept { return m_maxPosition; }
-   constexpr Position getMaxPosition() && noexcept { return m_maxPosition; }
+   constexpr Id get_id() noexcept { return m_id; }
+   constexpr const Position& get_max_position() & noexcept { return m_maxPosition; }
+   constexpr Position get_max_position() && noexcept { return m_maxPosition; }
 
 private:
    Id m_id;
