@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<EpidemicSimulationConfig>
+	
+	<Agents>
+		<Agent name="Working Adult">
+		</Agent>
+		<Agent name="Child in School">
+		</Agent>
+	</Agents>
+
+	<Buildings>
+		<Building name="Home">
+			<MinSize>
+				<x> 30.0 </x>
+				<y> 30.0 </y>
+			</MinSize>
+			<MaxSize>
+				<x> 60.0 </x>
+				<y> 60.0 </y>
+			</MaxSize>
+			<StartingAgents>
+				<Agent name="Working Adult">
+					<Fixed> 2 </Fixed>
+				</Agent>
+				<Agent name="Child in School">
+					<PDF>
+						0 0.25
+						1 0.50
+						2 0.20
+						3 0.05
+					</PDF>
+				</Agent>
+			</StartingAgents>
+		</Building>
+		<Building name="Office">
+			<MinSize>
+				<x> 30.0 </x>
+				<y> 30.0 </y>
+			</MinSize>
+			<MaxSize>
+				<x> 1000.0 </x>
+				<y> 1000.0 </y>
+			</MaxSize>
+			<StartingAgents/>
+		</Building>
+		<Building name="Essential">
+			<MinSize>
+				<x> 30.0 </x>
+				<y> 30.0 </y>
+			</MinSize>
+			<MaxSize>
+				<x> 1000.0 </x>
+				<y> 1000.0 </y>
+			</MaxSize>
+			<StartingAgents/>
+		</Building>
+		<Building name="NonEssential">
+			<MinSize>
+				<x> 30.0 </x>
+				<y> 30.0 </y>
+			</MinSize>
+			<MaxSize>
+				<x> 1000.0 </x>
+				<y> 1000.0 </y>
+			</MaxSize>
+			<StartingAgents/>
+		</Building>
+		<Building name="School">
+			<MinSize>
+				<x> 30.0 </x>
+				<y> 30.0 </y>
+			</MinSize>
+			<MaxSize>
+				<x> 1000.0 </x>
+				<y> 1000.0 </y>
+			</MaxSize>
+			<StartingAgents/>
+		</Building>
+	</Buildings>
+
+	<Communities>
+		<Community name="Small">
+			<Building name="Home">
+				<Gaussian>
+					<Mean> 100 </Mean>
+					<StdDev> 20 </StdDev>
+				</Gaussian>
+			</Building>
+			<Building name="Office">
+				<PDF>
+					5 0.2
+					6 0.2
+					7 0.2
+					8 0.1
+					9 0.1
+					10 0.1
+					11 0.1
+				</PDF>
+			</Building>
+			<Building name="Essential">
+				<PDF>
+					5 0.3
+					6 0.4
+					7 0.3
+				</PDF>
+			</Building>
+			<Building name="NonEssential">
+				<Gaussian>
+					<Mean> 20 </Mean>
+					<StdDev> 3 </StdDev>
+				</Gaussian>
+			</Building>
+			<Building name="School">
+				<Fixed> 1 </Fixed>
+			</Building>
+		</Community>
+		<Community name="Medium">
+			<Building name="Home">
+				<Gaussian>
+					<Mean> 1000 </Mean>
+					<StdDev> 100 </StdDev>
+				</Gaussian>
+			</Building>
+			<Building name="Office">
+				<PDF>
+					50 0.2
+					60 0.2
+					70 0.2
+					80 0.1
+					90 0.1
+					100 0.1
+					110 0.1
+				</PDF>
+			</Building>
+			<Building name="Essential">
+				<PDF>
+					50 0.3
+					60 0.4
+					70 0.3
+				</PDF>
+			</Building>
+			<Building name="NonEssential">
+				<Gaussian>
+					<Mean> 200 </Mean>
+					<StdDev> 20 </StdDev>
+				</Gaussian>
+			</Building>
+			<Building name="School">
+				<Fixed> 5 </Fixed>
+			</Building>
+		</Community>
+		<Community name="Large">
+			<Building name="Home">
+				<Gaussian>
+					<Mean> 10000 </Mean>
+					<StdDev> 1000 </StdDev>
+				</Gaussian>
+			</Building>
+			<Building name="Office">
+				<PDF>
+					500 0.2
+					600 0.2
+					700 0.2
+					800 0.1
+					900 0.1
+					1000 0.1
+					1100 0.1
+				</PDF>
+			</Building>
+			<Building name="Essential">
+				<PDF>
+					500 0.3
+					600 0.4
+					700 0.3
+				</PDF>
+			</Building>
+			<Building name="NonEssential">
+				<Gaussian>
+					<Mean> 800 </Mean>
+					<StdDev> 100 </StdDev>
+				</Gaussian>
+			</Building>
+			<Building name="School">
+				<Fixed> 30 </Fixed>
+			</Building>
+		</Community>
+	</Communities>
+
+	<WorldConfiguration>
+	</WorldConfiguration>
+</EpidemicSimulationConfig>

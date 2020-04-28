@@ -5,10 +5,17 @@
 #ifndef EPIDEMIC_SIM_WORLDCONFIGURATION_H
 #define EPIDEMIC_SIM_WORLDCONFIGURATION_H
 
+// STL
+#include <vector>
+
+// Epidemic
+#include "CommunityConfiguration.h"
+
 namespace Epidemic {
 
 struct WorldConfiguration
 {
+   std::vector<CommunityConfiguration> communities;
 };
 
 } // namespace Epidemic

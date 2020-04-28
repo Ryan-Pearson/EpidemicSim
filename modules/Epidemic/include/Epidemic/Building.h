@@ -5,21 +5,17 @@
 #ifndef EPIDEMIC_SIM_BUILDING_H
 #define EPIDEMIC_SIM_BUILDING_H
 
-namespace Epidemic {
+// STL
+#include <string>
+#include <unordered_map>
 
-using BuildingId = int;
+namespace Epidemic {
 
 class Building
 {
 public:
-   enum class Type
-   {
-      ESSENTIAL,
-      HOUSE,
-      NON_ESSENTIAL,
-      OFFICE,
-      SCHOOL
-   };
+   using Id = int;
+   using Type = int;
 
    struct Position
    {
@@ -27,16 +23,20 @@ public:
       double y;
    };
 
+   static Type get_building_type_by_name(const std::string& name);
+
    explicit Building(Type type, const Position& maxPosition) noexcept;
 
-   constexpr BuildingId getId() noexcept { return m_id; }
+   constexpr Id getId() noexcept { return m_id; }
    constexpr const Position& getMaxPosition() & noexcept { return m_maxPosition; }
    constexpr Position getMaxPosition() && noexcept { return m_maxPosition; }
 
 private:
-   BuildingId m_id;
+   Id m_id;
    Type m_type;
    Position m_maxPosition;
+
+   static std::unordered_map<std::string, Type> s_typeByName;
 };
 
 } // namespace Epidemic

@@ -10,6 +10,7 @@
 #include <vector>
 
 // Epidemic
+#include "CommunityConfiguration.h"
 #include "Building.h"
 
 namespace Epidemic {
@@ -21,7 +22,7 @@ class Community
 public:
    using BuildingByTypeMap = std::unordered_map<Building::Type, std::vector<Building>>;
 
-   explicit Community() noexcept;
+   explicit Community(const CommunityConfiguration& configuration) noexcept;
 
    constexpr CommunityID getId() noexcept { return m_id; }
    const std::vector<Building>& getBuildingsOfType(Building::Type type) const &;
