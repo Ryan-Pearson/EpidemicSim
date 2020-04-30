@@ -24,10 +24,10 @@
 				</Agent>
 				<Agent name="Child in School">
 					<PDF>
-						0 0.25
-						1 0.50
-						2 0.20
-						3 0.05
+						0 25
+						1 50
+						2 20
+						3 05
 					</PDF>
 				</Agent>
 			</StartingAgents>
@@ -88,20 +88,20 @@
 			</Building>
 			<Building name="Office">
 				<PDF>
-					5 0.2
-					6 0.2
-					7 0.2
-					8 0.1
-					9 0.1
-					10 0.1
-					11 0.1
+					5 20
+					6 20
+					7 20
+					8 10
+					9 10
+					10 10
+					11 10
 				</PDF>
 			</Building>
 			<Building name="Essential">
 				<PDF>
-					5 0.3
-					6 0.4
-					7 0.3
+					5 30
+					6 40
+					7 30
 				</PDF>
 			</Building>
 			<Building name="NonEssential">
@@ -123,20 +123,20 @@
 			</Building>
 			<Building name="Office">
 				<PDF>
-					50 0.2
-					60 0.2
-					70 0.2
-					80 0.1
-					90 0.1
-					100 0.1
-					110 0.1
+					50 20
+					60 20
+					70 20
+					80 10
+					90 10
+					100 10
+					110 10
 				</PDF>
 			</Building>
 			<Building name="Essential">
 				<PDF>
-					50 0.3
-					60 0.4
-					70 0.3
+					50 30
+					60 40
+					70 30
 				</PDF>
 			</Building>
 			<Building name="NonEssential">
@@ -158,20 +158,20 @@
 			</Building>
 			<Building name="Office">
 				<PDF>
-					500 0.2
-					600 0.2
-					700 0.2
-					800 0.1
-					900 0.1
-					1000 0.1
-					1100 0.1
+					500 20
+					600 20
+					700 20
+					800 10
+					900 10
+					1000 10
+					1100 10
 				</PDF>
 			</Building>
 			<Building name="Essential">
 				<PDF>
-					500 0.3
-					600 0.4
-					700 0.3
+					500 30
+					600 40
+					700 30
 				</PDF>
 			</Building>
 			<Building name="NonEssential">

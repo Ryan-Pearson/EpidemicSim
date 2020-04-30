@@ -9,6 +9,9 @@ std::unordered_map<std::string, Building::Type> Building::s_typeByName;
 Building::Building(const Type type, const Position& maxPosition) noexcept :
    m_id(++uniqueBuildingId), m_type(type), m_maxPosition(maxPosition)
 {
+   (void)m_id;
+   (void)m_type;
+   (void)m_maxPosition;
 }
 
 Building::Type Building::get_building_type_by_name(const std::string& name)

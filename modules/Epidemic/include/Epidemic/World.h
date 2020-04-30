@@ -22,8 +22,8 @@ public:
    explicit World(const WorldConfiguration& config);
 
 private:
-   std::unordered_map<CommunityID, Community> m_communities;
-   std::unordered_map<AgentID, Agent> m_agents;
+   std::unordered_map<Community::Id, Community> m_communities;
+   std::unordered_map<Agent::Id, Agent> m_agents;
 };
 
 } // namespace Epidemic

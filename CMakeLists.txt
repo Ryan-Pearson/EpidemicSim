@@ -62,6 +62,12 @@ if (BUILD_UNIT_TESTS)
 endif(BUILD_UNIT_TESTS)
 
 ################################
+# Conan dependency setup
+################################
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
+################################
 # Adding modules
 ################################
 add_subdirectory(modules)

@@ -15,6 +15,7 @@ add_library(Epidemic ${ModuleLibType}
         include/Epidemic/Building.h
         include/Epidemic/Community.h
         include/Epidemic/CommunityConfiguration.h
+        include/Epidemic/CommonConfiguration.h
         include/Epidemic/World.h
         include/Epidemic/WorldConfiguration.h
 
@@ -23,6 +24,7 @@ add_library(Epidemic ${ModuleLibType}
         src/Building.cpp
         src/Community.cpp
         src/CommunityConfiguration.cpp
+        src/CommonConfiguration.cpp
         src/World.cpp
         src/WorldConfiguration.cpp
         )
@@ -43,7 +45,7 @@ generate_export_header(Epidemic EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/epi
 target_link_libraries(Epidemic
       PUBLIC
       modules_public_config
-#      Boost::boost
+      ${CONAN_LIBS}
 
       PRIVATE
       modules_private_config

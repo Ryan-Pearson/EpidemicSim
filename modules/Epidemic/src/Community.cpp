@@ -6,7 +6,10 @@ static Community::Id uniqueCommunityId = -1;
 static Community::Type uniqueCommunityType = -1;
 std::unordered_map<std::string, Community::Type> Community::s_typeByName;
 
-Community::Community(const CommunityConfiguration& configuration) noexcept : m_id(++uniqueCommunityId) { }
+Community::Community(const CommunityConfiguration& /*configuration*/) noexcept : m_id(++uniqueCommunityId)
+{
+   (void)m_id;
+}
 
 Community::Type Community::get_community_type_by_name(const std::string& name)
 {
