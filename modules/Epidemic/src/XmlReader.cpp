@@ -110,12 +110,12 @@ static std::vector<BuildingConfiguration> read_buildings(const pugi::xml_node bu
    for (pugi::xml_node building = buildingsNode.child(BUILDING_NODE); building;
         building = building.next_sibling(BUILDING_NODE))
    {
-      const std::string name = building.attribute("name").value();
+      const std::string buildingName = building.attribute("name").value();
       const auto minSize = building.child("MinSize");
       const auto maxSize = building.child("MaxSize");
       if (!minSize || !maxSize)
       {
-         throw std::runtime_error(fmt::format("Building {}: Min or Max size not found", name));
+         throw std::runtime_error(fmt::format("Building {}: Min or Max size not found", buildingName));
       }
 
       const auto minXNode = minSize.child("x");
@@ -124,7 +124,7 @@ static std::vector<BuildingConfiguration> read_buildings(const pugi::xml_node bu
       const auto maxYNode = maxSize.child("y");
       if (!minXNode || !minYNode || !maxXNode || !maxYNode)
       {
-         throw std::runtime_error(fmt::format("Building {}: Min or Max size not properly formatted", name));
+         throw std::runtime_error(fmt::format("Building {}: Min or Max size not properly formatted", buildingName));
       }
 
       std::string minXStr = minXNode.child_value();
@@ -147,15 +147,15 @@ static std::vector<BuildingConfiguration> read_buildings(const pugi::xml_node bu
       if (startingAgentNodes)
       {
          for (pugi::xml_node startingAgent = startingAgentNodes.child("Agent"); startingAgent;
-              startingAgent = startingAgentNodes.next_sibling("Agent"))
+              startingAgent = startingAgent.next_sibling("Agent"))
          {
             const std::string agentName = startingAgent.attribute("name").value();
             const auto distribution = read_distribution_from_node(startingAgent);
-            startingAgents.emplace_back(name, distribution);
+            startingAgents.emplace_back(agentName, distribution);
          }
       }
 
-      ret.emplace_back(BuildingConfiguration {minX, minY, maxX, maxY, std::move(startingAgents)});
+      ret.emplace_back(BuildingConfiguration {buildingName, minX, minY, maxX, maxY, std::move(startingAgents)});
    }
 
    return ret;
@@ -171,7 +171,7 @@ static std::vector<CommunityConfiguration> read_communities(const pugi::xml_node
       const std::string communityName = community.attribute("name").value();
       std::unordered_map<std::string, Statistics::Distribution> buildings;
       for (pugi::xml_node buildingNode = community.child("Building"); buildingNode;
-           buildingNode = community.next_sibling("Building"))
+           buildingNode = buildingNode.next_sibling("Building"))
       {
          const std::string buildingName = buildingNode.attribute("name").value();
          const auto distribution = read_distribution_from_node(buildingNode);

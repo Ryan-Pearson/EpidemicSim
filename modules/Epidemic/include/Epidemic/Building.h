@@ -17,6 +17,7 @@ namespace Epidemic {
 
 struct BuildingConfiguration
 {
+   std::string m_name;
    double m_minX;
    double m_minY;
    double m_maxX;
