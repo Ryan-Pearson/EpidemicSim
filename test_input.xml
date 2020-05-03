@@ -187,5 +187,14 @@
 	</Communities>
 
 	<WorldConfiguration>
+		<Community name="Large">
+			<Fixed> 1 </Fixed>
+		</Community>
+		<Community name="Medium">
+			<Fixed> 1 </Fixed>
+		</Community>
+		<Community name="Small">
+			<Fixed> 1 </Fixed>
+		</Community>
 	</WorldConfiguration>
 </EpidemicSimulationConfig>

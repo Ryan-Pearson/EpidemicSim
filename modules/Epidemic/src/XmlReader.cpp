@@ -21,11 +21,13 @@ constexpr char CONFIG_ROOT[] = "EpidemicSimulationConfig";
 constexpr char AGENTS_ROOT[] = "Agents";
 constexpr char AGENT_NODE[] = "Agent";
 
+constexpr char BUILDING_ROOT[] = "Buildings";
+constexpr char BUILDING_NODE[] = "Building";
+
 constexpr char COMMUNITY_ROOT[] = "Communities";
 constexpr char COMMUNITY_NODE[] = "Community";
 
-constexpr char BUILDING_ROOT[] = "Buildings";
-constexpr char BUILDING_NODE[] = "Building";
+constexpr char WORLD_ROOT[] = "WorldConfiguration";
 
 static Epidemic::Statistics::Distribution read_distribution_from_node(const pugi::xml_node node)
 {
@@ -81,8 +83,7 @@ static Epidemic::Statistics::Distribution read_distribution_from_node(const pugi
    {
       std::string fixedText = fixedNode.child_value();
       boost::algorithm::trim(fixedText);
-      const auto fixedValue = boost::lexical_cast<int>(fixedText);
-      return Epidemic::Statistics::Fixed(fixedValue);
+      return Epidemic::Statistics::Fixed {boost::lexical_cast<int>(fixedText)};
    }
    else
    {
@@ -90,7 +91,7 @@ static Epidemic::Statistics::Distribution read_distribution_from_node(const pugi
    }
 }
 
-static std::vector<AgentConfiguration> read_agents(const pugi::xml_node agentsNode)
+static std::vector<AgentConfiguration> read_agent_configs(const pugi::xml_node agentsNode)
 {
    std::vector<AgentConfiguration> ret;
 
@@ -103,7 +104,7 @@ static std::vector<AgentConfiguration> read_agents(const pugi::xml_node agentsNo
    return ret;
 }
 
-static std::vector<BuildingConfiguration> read_buildings(const pugi::xml_node buildingsNode)
+static std::vector<BuildingConfiguration> read_building_configs(const pugi::xml_node buildingsNode)
 {
    std::vector<BuildingConfiguration> ret;
 
@@ -161,7 +162,7 @@ static std::vector<BuildingConfiguration> read_buildings(const pugi::xml_node bu
    return ret;
 }
 
-static std::vector<CommunityConfiguration> read_communities(const pugi::xml_node communitiesNode)
+static std::vector<CommunityConfiguration> read_community_configs(const pugi::xml_node communitiesNode)
 {
    std::vector<CommunityConfiguration> ret;
 
@@ -178,6 +179,19 @@ static std::vector<CommunityConfiguration> read_communities(const pugi::xml_node
          buildings.emplace(buildingName, distribution);
       }
       ret.emplace_back(CommunityConfiguration {communityName, std::move(buildings)});
+   }
+
+   return ret;
+}
+
+static std::unordered_map<std::string, Statistics::Distribution> read_communinities(const pugi::xml_node worldNode)
+{
+   std::unordered_map<std::string, Statistics::Distribution> ret;
+
+   for (pugi::xml_node community = worldNode.child(COMMUNITY_NODE); community;
+        community = community.next_sibling(COMMUNITY_NODE))
+   {
+      ret.emplace(community.attribute("name").value(), read_distribution_from_node(community));
    }
 
    return ret;
@@ -201,34 +215,44 @@ WorldConfiguration get_world_config_from_xml(const std::string& fullFilePath)
       throw std::runtime_error(fmt::format("Could not find XML Element ", CONFIG_ROOT));
    }
 
-   const auto agentsNode = mainConfig.child(AGENTS_ROOT);
-   if (agentsNode)
+   const auto agentConfigNode = mainConfig.child(AGENTS_ROOT);
+   if (agentConfigNode)
    {
-      ret.m_agents = read_agents(agentsNode);
+      ret.m_agentConfigs = read_agent_configs(agentConfigNode);
    }
    else
    {
       throw std::runtime_error(fmt::format("Could not find XML Element ", AGENTS_ROOT));
    }
 
-   const auto buildingsNode = mainConfig.child(BUILDING_ROOT);
-   if (buildingsNode)
+   const auto buildingConfigNode = mainConfig.child(BUILDING_ROOT);
+   if (buildingConfigNode)
    {
-      ret.m_buildings = read_buildings(buildingsNode);
+      ret.m_buildingConfigs = read_building_configs(buildingConfigNode);
    }
    else
    {
       throw std::runtime_error(fmt::format("Could not find XML Element ", BUILDING_ROOT));
    }
 
-   const auto communitiesNode = mainConfig.child(COMMUNITY_ROOT);
-   if (communitiesNode)
+   const auto communityConfigNode = mainConfig.child(COMMUNITY_ROOT);
+   if (communityConfigNode)
    {
-      ret.m_communities = read_communities(communitiesNode);
+      ret.m_communityConfigs = read_community_configs(communityConfigNode);
    }
    else
    {
       throw std::runtime_error(fmt::format("Could not find XML Element ", COMMUNITY_ROOT));
+   }
+
+   const auto worldConfigNode = mainConfig.child(WORLD_ROOT);
+   if (worldConfigNode)
+   {
+      ret.m_communities = read_communinities(worldConfigNode);
+   }
+   else
+   {
+      throw std::runtime_error(fmt::format("Could not find XML Element ", WORLD_ROOT));
    }
 
    return ret;

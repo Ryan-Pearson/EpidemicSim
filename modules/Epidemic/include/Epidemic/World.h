@@ -17,9 +17,11 @@ namespace Epidemic {
 
 struct WorldConfiguration
 {
-   std::vector<AgentConfiguration> m_agents;
-   std::vector<BuildingConfiguration> m_buildings;
-   std::vector<CommunityConfiguration> m_communities;
+   std::vector<AgentConfiguration> m_agentConfigs;
+   std::vector<BuildingConfiguration> m_buildingConfigs;
+   std::vector<CommunityConfiguration> m_communityConfigs;
+
+   std::unordered_map<std::string, Statistics::Distribution> m_communities;
 };
 
 class World

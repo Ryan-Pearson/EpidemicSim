@@ -7,8 +7,8 @@
 
 // STL
 #include <random>
-#include <vector>
 #include <variant>
+#include <vector>
 
 // Boost
 #include <boost/container/flat_map.hpp>
@@ -20,7 +20,7 @@ namespace Statistics {
 
    struct PDF
    {
-      PDF(const boost::container::flat_map<int, int>& numToWeight);
+      explicit PDF(const boost::container::flat_map<int, int>& numToWeight);
 
       std::vector<int> m_numByIdx;
       std::discrete_distribution<int> m_dist;
@@ -28,15 +28,13 @@ namespace Statistics {
 
    struct Gaussian
    {
-      Gaussian(const double mean, const double stdDev) noexcept : m_dist(mean, stdDev) { }
+      explicit Gaussian(const double mean, const double stdDev) noexcept : m_dist(mean, stdDev) { }
 
       std::normal_distribution<double> m_dist;
    };
 
    struct Fixed
    {
-      constexpr Fixed(const int value) noexcept : m_value(value) { }
-
       int m_value;
    };
 
