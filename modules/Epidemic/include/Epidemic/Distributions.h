@@ -20,15 +20,15 @@ namespace Statistics {
    {
       PDF(const boost::container::flat_map<int, int>& numToWeight);
 
-      std::vector<int> numByIdx;
-      std::discrete_distribution<int> dist;
+      std::vector<int> m_numByIdx;
+      std::discrete_distribution<int> m_dist;
    };
 
    struct Gaussian
    {
-      Gaussian(const double mean, const double stdDev) noexcept : dist(mean, stdDev) { }
+      Gaussian(const double mean, const double stdDev) noexcept : m_dist(mean, stdDev) { }
 
-      std::normal_distribution<double> dist;
+      std::normal_distribution<double> m_dist;
    };
 
    struct Fixed
@@ -39,6 +39,8 @@ namespace Statistics {
    };
 
    using Distribution = std::variant<PDF, Gaussian, Fixed>;
+
+   int sample_distribution(const Distribution& dist) noexcept;
 
 } // namespace Statistics
 } // namespace Epidemic
