@@ -16,6 +16,8 @@
 namespace Epidemic {
 namespace Statistics {
 
+   extern std::mt19937 GLOBAL_RANDOM_ENGINE;
+
    struct PDF
    {
       PDF(const boost::container::flat_map<int, int>& numToWeight);
