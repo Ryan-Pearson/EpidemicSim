@@ -141,6 +141,7 @@ else()
             # -Wformat=2 # warn on security issues around functions that format output (ie printf)
             -Wfatal-errors # Stop on first error occurred as opposed to trying to continue on to get more error messages
             -Wno-unused-local-typedefs # Allow unused local typedefs
+            -Wno-double-promotion # Needed for boost lexical cast
             )
 
     target_compile_options(modules_public_config INTERFACE

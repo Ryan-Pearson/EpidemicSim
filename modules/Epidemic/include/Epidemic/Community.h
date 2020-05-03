@@ -10,10 +10,16 @@
 #include <vector>
 
 // Epidemic
-#include "CommunityConfiguration.h"
 #include "Building.h"
+#include "Distributions.h"
 
 namespace Epidemic {
+
+struct CommunityConfiguration
+{
+   std::string m_name;
+   std::unordered_map<std::string, Statistics::Distribution> m_buildings;
+};
 
 class Community
 {
@@ -28,7 +34,7 @@ public:
    static Type get_community_type_by_name(const std::string& name);
 
    constexpr Id get_id() noexcept { return m_id; }
-   const std::vector<Building>& get_buildings_of_type(Building::Type type) const &;
+   const std::vector<Building>& get_buildings_of_type(Building::Type type) const&;
 
 private:
    Id m_id;

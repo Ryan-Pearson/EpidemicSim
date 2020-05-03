@@ -12,9 +12,15 @@
 #include "Agent.h"
 #include "Building.h"
 #include "Community.h"
-#include "WorldConfiguration.h"
 
 namespace Epidemic {
+
+struct WorldConfiguration
+{
+   std::vector<AgentConfiguration> m_agents;
+   std::vector<BuildingConfiguration> m_buildings;
+   std::vector<CommunityConfiguration> m_communities;
+};
 
 class World
 {

@@ -11,6 +11,11 @@
 
 namespace Epidemic {
 
+struct AgentConfiguration
+{
+   std::string m_name;
+};
+
 class Agent
 {
 public:

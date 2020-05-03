@@ -2,8 +2,8 @@
 // Created by Ryan S. Pearson on 4/29/20.
 //
 
-#ifndef EPIDEMIC_SIM_COMMONCONFIGURATION_H
-#define EPIDEMIC_SIM_COMMONCONFIGURATION_H
+#ifndef EPIDEMIC_SIM_DISTRIBUTIONS_H
+#define EPIDEMIC_SIM_DISTRIBUTIONS_H
 
 // STL
 #include <random>
@@ -43,4 +43,4 @@ namespace Statistics {
 } // namespace Statistics
 } // namespace Epidemic
 
-#endif //EPIDEMIC_SIM_COMMONCONFIGURATION_H
+#endif //EPIDEMIC_SIM_DISTRIBUTIONS_H

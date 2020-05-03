@@ -9,7 +9,20 @@
 #include <string>
 #include <unordered_map>
 
+// Epidemic
+#include "Agent.h"
+#include "Distributions.h"
+
 namespace Epidemic {
+
+struct BuildingConfiguration
+{
+   double m_minX;
+   double m_minY;
+   double m_maxX;
+   double m_maxY;
+   std::vector<std::pair<std::string, Statistics::Distribution>> m_agentNameAndDistribution;
+};
 
 class Building
 {
@@ -19,8 +32,8 @@ public:
 
    struct Position
    {
-      double x;
-      double y;
+      double m_x;
+      double m_y;
    };
 
    static Type get_building_type_by_name(const std::string& name);

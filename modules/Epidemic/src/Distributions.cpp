@@ -2,7 +2,7 @@
 // Created by Ryan S. Pearson on 4/29/20.
 //
 
-#include "Epidemic/CommonConfiguration.h"
+#include "Epidemic/Distributions.h"
 
 namespace Epidemic {
 namespace Statistics {
