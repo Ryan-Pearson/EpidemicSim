@@ -150,14 +150,7 @@ static std::vector<BuildingConfiguration> read_buildings(const pugi::xml_node bu
               startingAgent = startingAgentNodes.next_sibling("Agent"))
          {
             const std::string agentName = startingAgent.attribute("name").value();
-            const auto distributionNode = startingAgent.first_child();
-
-            if (!distributionNode)
-            {
-               throw std::runtime_error(fmt::format("Could not find distribution for starting agent {}", agentName));
-            }
-
-            const auto distribution = read_distribution_from_node(distributionNode);
+            const auto distribution = read_distribution_from_node(startingAgent);
             startingAgents.emplace_back(name, distribution);
          }
       }
@@ -181,14 +174,7 @@ static std::vector<CommunityConfiguration> read_communities(const pugi::xml_node
            buildingNode = community.next_sibling("Building"))
       {
          const std::string buildingName = buildingNode.attribute("name").value();
-         const auto distributionNode = buildingNode.first_child();
-
-         if (!distributionNode)
-         {
-            throw std::runtime_error(fmt::format("Could not find distribution for starting building {}", buildingName));
-         }
-
-         const auto distribution = read_distribution_from_node(distributionNode);
+         const auto distribution = read_distribution_from_node(buildingNode);
          buildings.emplace(buildingName, distribution);
       }
       ret.emplace_back(CommunityConfiguration {communityName, std::move(buildings)});
