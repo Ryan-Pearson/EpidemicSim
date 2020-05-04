@@ -5,7 +5,10 @@ namespace Epidemic {
 static Agent::Id uniqueAgentId = -1;
 static Agent::Type uniqueAgentType = -1;
 
-Agent::Agent() noexcept : m_id(++uniqueAgentId) { }
+Agent::Agent(const AgentConfiguration& agentConfiguration):
+   m_id(++uniqueAgentId), m_type(get_agent_type_by_name(agentConfiguration.m_name))
+{
+}
 
 Agent::Type Agent::get_agent_type_by_name(const std::string& name)
 {

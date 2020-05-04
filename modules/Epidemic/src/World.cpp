@@ -2,7 +2,7 @@
 
 namespace Epidemic {
 
-World::World(const WorldConfiguration& /*config*/)
+World::World(const WorldConfiguration& config)
 {
 }
 

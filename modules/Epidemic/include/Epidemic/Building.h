@@ -39,7 +39,9 @@ public:
 
    static Type get_building_type_by_name(const std::string& name);
 
-   explicit Building(Type type, const Position& maxPosition) noexcept;
+   explicit Building(const BuildingConfiguration& buildingConfiguration,
+      const std::vector<AgentConfiguration>& agentConfigurations,
+      std::unordered_map<Agent::Id, Agent>& agentContainer);
 
    constexpr Id get_id() noexcept { return m_id; }
    constexpr const Position& get_max_position() & noexcept { return m_maxPosition; }

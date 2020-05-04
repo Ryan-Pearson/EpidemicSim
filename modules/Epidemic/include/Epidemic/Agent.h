@@ -22,12 +22,13 @@ public:
    using Id = int;
    using Type = int;
 
-   explicit Agent() noexcept;
+   explicit Agent(const AgentConfiguration& agentConfiguration);
 
    static Type get_agent_type_by_name(const std::string& name);
 
 private:
    Id m_id;
+   Type m_type;
 
    static std::unordered_map<std::string, Type> s_typeByName;
 };
