@@ -16,6 +16,7 @@ add_library(Epidemic ${ModuleLibType}
         include/Epidemic/Community.h
         include/Epidemic/Distributions.h
         include/Epidemic/World.h
+        include/Epidemic/WorldBuilder.h
         include/Epidemic/XmlReader.h
 
         # Listing of all sources
@@ -24,6 +25,7 @@ add_library(Epidemic ${ModuleLibType}
         src/Community.cpp
         src/Distributions.cpp
         src/World.cpp
+        src/WorldBuilder.cpp
         src/XmlReader.cpp
         )
 

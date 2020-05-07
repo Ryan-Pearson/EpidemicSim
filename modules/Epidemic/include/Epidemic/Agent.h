@@ -11,20 +11,17 @@
 
 namespace Epidemic {
 
-struct AgentConfiguration
-{
-   std::string m_name;
-};
-
 class Agent
 {
 public:
    using Id = int;
    using Type = int;
 
-   explicit Agent(const AgentConfiguration& agentConfiguration);
-
    static Type get_agent_type_by_name(const std::string& name);
+
+   explicit Agent(const std::string& agentName);
+
+   [[nodiscard]] constexpr Id get_id() const noexcept { return m_id; }
 
 private:
    Id m_id;

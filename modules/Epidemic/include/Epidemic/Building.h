@@ -15,16 +15,6 @@
 
 namespace Epidemic {
 
-struct BuildingConfiguration
-{
-   std::string m_name;
-   double m_minX;
-   double m_minY;
-   double m_maxX;
-   double m_maxY;
-   std::vector<std::pair<std::string, Statistics::Distribution>> m_agentNameAndDistribution;
-};
-
 class Building
 {
 public:
@@ -39,13 +29,11 @@ public:
 
    static Type get_building_type_by_name(const std::string& name);
 
-   explicit Building(const BuildingConfiguration& buildingConfiguration,
-      const std::vector<AgentConfiguration>& agentConfigurations,
-      std::unordered_map<Agent::Id, Agent>& agentContainer);
+   explicit Building(const std::string& buildingName, const Position& maxPosition);
 
-   constexpr Id get_id() noexcept { return m_id; }
-   constexpr const Position& get_max_position() & noexcept { return m_maxPosition; }
-   constexpr Position get_max_position() && noexcept { return m_maxPosition; }
+   [[nodiscard]] constexpr Id get_id() const noexcept { return m_id; }
+   [[nodiscard]] constexpr const Position& get_max_position() const & noexcept { return m_maxPosition; }
+   [[nodiscard]] constexpr Position get_max_position() && noexcept { return m_maxPosition; }
 
 private:
    Id m_id;

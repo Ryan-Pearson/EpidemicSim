@@ -6,9 +6,8 @@ static Community::Id uniqueCommunityId = -1;
 static Community::Type uniqueCommunityType = -1;
 std::unordered_map<std::string, Community::Type> Community::s_typeByName;
 
-Community::Community(const CommunityConfiguration& /*configuration*/) noexcept : m_id(++uniqueCommunityId)
+Community::Community(BuildingByTypeMap buildings) : m_id(++uniqueCommunityId), m_buildings(std::move(buildings))
 {
-   (void)m_id;
 }
 
 Community::Type Community::get_community_type_by_name(const std::string& name)
@@ -20,11 +19,6 @@ Community::Type Community::get_community_type_by_name(const std::string& name)
       it = emplace_ret.first;
    }
    return it->second;
-}
-
-const std::vector<Building>& Community::get_buildings_of_type(const Building::Type type) const&
-{
-   return m_buildings.at(type);
 }
 
 } // namespace Epidemic

@@ -6,7 +6,7 @@
 #define EPIDEMIC_SIM_XMLREADER_H
 
 // Epidemic
-#include "World.h"
+#include "WorldBuilder.h"
 
 namespace Epidemic {
 

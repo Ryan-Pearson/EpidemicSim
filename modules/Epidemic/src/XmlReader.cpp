@@ -91,22 +91,22 @@ static Epidemic::Statistics::Distribution read_distribution_from_node(const pugi
    }
 }
 
-static std::vector<AgentConfiguration> read_agent_configs(const pugi::xml_node agentsNode)
+static std::unordered_map<Agent::Id, AgentConfiguration> read_agent_configs(const pugi::xml_node agentsNode)
 {
-   std::vector<AgentConfiguration> ret;
+   std::unordered_map<Agent::Id, AgentConfiguration> ret;
 
    for (pugi::xml_node agent = agentsNode.child(AGENT_NODE); agent; agent = agent.next_sibling(AGENT_NODE))
    {
-      const std::string name = agent.attribute("name").value();
-      ret.emplace_back(AgentConfiguration {name});
+      const std::string agentName = agent.attribute("name").value();
+      ret.emplace(Agent::get_agent_type_by_name(agentName), AgentConfiguration {agentName});
    }
 
    return ret;
 }
 
-static std::vector<BuildingConfiguration> read_building_configs(const pugi::xml_node buildingsNode)
+static std::unordered_map<Building::Id, BuildingConfiguration> read_building_configs(const pugi::xml_node buildingsNode)
 {
-   std::vector<BuildingConfiguration> ret;
+   std::unordered_map<Building::Id, BuildingConfiguration> ret;
 
    for (pugi::xml_node building = buildingsNode.child(BUILDING_NODE); building;
         building = building.next_sibling(BUILDING_NODE))
@@ -143,7 +143,7 @@ static std::vector<BuildingConfiguration> read_building_configs(const pugi::xml_
       const auto maxX = boost::lexical_cast<double>(maxXStr);
       const auto maxY = boost::lexical_cast<double>(maxYStr);
 
-      std::vector<std::pair<std::string, Statistics::Distribution>> startingAgents;
+      std::unordered_map<Agent::Id, Statistics::Distribution> startingAgents;
       const auto startingAgentNodes = building.child("StartingAgents");
       if (startingAgentNodes)
       {
@@ -152,46 +152,50 @@ static std::vector<BuildingConfiguration> read_building_configs(const pugi::xml_
          {
             const std::string agentName = startingAgent.attribute("name").value();
             const auto distribution = read_distribution_from_node(startingAgent);
-            startingAgents.emplace_back(agentName, distribution);
+            startingAgents.emplace(Agent::get_agent_type_by_name(agentName), distribution);
          }
       }
 
-      ret.emplace_back(BuildingConfiguration {buildingName, minX, minY, maxX, maxY, std::move(startingAgents)});
+      ret.emplace(Building::get_building_type_by_name(buildingName),
+         BuildingConfiguration {buildingName, minX, minY, maxX, maxY, std::move(startingAgents)});
    }
 
    return ret;
 }
 
-static std::vector<CommunityConfiguration> read_community_configs(const pugi::xml_node communitiesNode)
+static std::unordered_map<Community::Id, CommunityConfiguration> read_community_configs(
+   const pugi::xml_node communitiesNode)
 {
-   std::vector<CommunityConfiguration> ret;
+   std::unordered_map<Community::Id, CommunityConfiguration> ret;
 
    for (pugi::xml_node community = communitiesNode.child(COMMUNITY_NODE); community;
         community = community.next_sibling(COMMUNITY_NODE))
    {
       const std::string communityName = community.attribute("name").value();
-      std::unordered_map<std::string, Statistics::Distribution> buildings;
+      std::unordered_map<Building::Id, Statistics::Distribution> buildings;
       for (pugi::xml_node buildingNode = community.child("Building"); buildingNode;
            buildingNode = buildingNode.next_sibling("Building"))
       {
          const std::string buildingName = buildingNode.attribute("name").value();
          const auto distribution = read_distribution_from_node(buildingNode);
-         buildings.emplace(buildingName, distribution);
+         buildings.emplace(Building::get_building_type_by_name(buildingName), distribution);
       }
-      ret.emplace_back(CommunityConfiguration {communityName, std::move(buildings)});
+      ret.emplace(Community::get_community_type_by_name(communityName),
+         CommunityConfiguration {communityName, std::move(buildings)});
    }
 
    return ret;
 }
 
-static std::unordered_map<std::string, Statistics::Distribution> read_communinities(const pugi::xml_node worldNode)
+static std::unordered_map<Community::Id, Statistics::Distribution> read_communinities(const pugi::xml_node worldNode)
 {
-   std::unordered_map<std::string, Statistics::Distribution> ret;
+   std::unordered_map<Community::Id, Statistics::Distribution> ret;
 
    for (pugi::xml_node community = worldNode.child(COMMUNITY_NODE); community;
         community = community.next_sibling(COMMUNITY_NODE))
    {
-      ret.emplace(community.attribute("name").value(), read_distribution_from_node(community));
+      const std::string communityName = community.attribute("name").value();
+      ret.emplace(Community::get_community_type_by_name(communityName), read_distribution_from_node(community));
    }
 
    return ret;
