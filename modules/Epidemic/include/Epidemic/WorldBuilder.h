@@ -21,22 +21,22 @@ struct BuildingConfiguration
    double m_minY;
    double m_maxX;
    double m_maxY;
-   std::unordered_map<Agent::Id, Statistics::Distribution> m_agents;
+   std::unordered_map<AgentType, Statistics::Distribution> m_agents;
 };
 
 struct CommunityConfiguration
 {
    std::string m_name;
-   std::unordered_map<int, Statistics::Distribution> m_buildings;
+   std::unordered_map<BuildingType, Statistics::Distribution> m_buildings;
 };
 
 struct WorldConfiguration
 {
-   std::unordered_map<int, AgentConfiguration> m_agentConfigs;
-   std::unordered_map<int, BuildingConfiguration> m_buildingConfigs;
-   std::unordered_map<int, CommunityConfiguration> m_communityConfigs;
+   std::unordered_map<AgentType, AgentConfiguration> m_agentConfigs;
+   std::unordered_map<BuildingType, BuildingConfiguration> m_buildingConfigs;
+   std::unordered_map<CommunityType, CommunityConfiguration> m_communityConfigs;
 
-   std::unordered_map<int, Statistics::Distribution> m_communities;
+   std::unordered_map<CommunityType, Statistics::Distribution> m_communities;
 };
 
 World build_world(const WorldConfiguration& worldConfiguration);

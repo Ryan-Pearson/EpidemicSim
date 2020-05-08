@@ -2,7 +2,8 @@
 
 namespace Epidemic {
 
-World::World(const WorldConfiguration& config)
+World::World(std::unordered_map<CommunityId, Community> communities, std::unordered_map<AgentId, Agent> agents) :
+   m_communities(std::move(communities)), m_agents(std::move(agents))
 {
 }
 

@@ -10,19 +10,18 @@
 
 // Epidemic
 #include "Agent.h"
-#include "Building.h"
-#include "Community.h"
 
 namespace Epidemic {
 
 class World
 {
 public:
-   explicit World(const WorldConfiguration& config);
+   explicit World(
+      std::unordered_map<CommunityId, Community> communities, std::unordered_map<AgentId, Agent> agents);
 
 private:
-   std::unordered_map<Community::Id, Community> m_communities;
-   std::unordered_map<Agent::Id, Agent> m_agents;
+   std::unordered_map<CommunityId, Community> m_communities;
+   std::unordered_map<AgentId, Agent> m_agents;
 };
 
 } // namespace Epidemic

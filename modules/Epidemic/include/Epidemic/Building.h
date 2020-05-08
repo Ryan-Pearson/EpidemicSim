@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 // Epidemic
-#include "Agent.h"
+#include "Types.h"
 #include "Distributions.h"
 
 namespace Epidemic {
@@ -18,29 +18,32 @@ namespace Epidemic {
 class Building
 {
 public:
-   using Id = int;
-   using Type = int;
-
    struct Position
    {
-      double m_x;
-      double m_y;
+      double m_x = 0.0;
+      double m_y = 0.0;
    };
 
-   static Type get_building_type_by_name(const std::string& name);
+   static BuildingType get_building_type_by_name(const std::string& name);
 
    explicit Building(const std::string& buildingName, const Position& maxPosition);
 
-   [[nodiscard]] constexpr Id get_id() const noexcept { return m_id; }
+   [[nodiscard]] constexpr BuildingId get_id() const noexcept { return m_id; }
    [[nodiscard]] constexpr const Position& get_max_position() const & noexcept { return m_maxPosition; }
    [[nodiscard]] constexpr Position get_max_position() && noexcept { return m_maxPosition; }
 
-private:
-   Id m_id;
-   Type m_type;
-   Position m_maxPosition;
+   Position agent_enters_building(AgentId agent);
+   void update_agent_position(AgentId agent, const Position& newPosition);
+   void agent_leaves_building(AgentId agent);
 
-   static std::unordered_map<std::string, Type> s_typeByName;
+private:
+   BuildingId m_id;
+   BuildingType m_type;
+   Position m_maxPosition;
+   Position m_entrancePosition;
+   std::unordered_map<AgentId, Position> m_curAgents;
+
+   static std::unordered_map<std::string, BuildingType> s_typeByName;
 };
 
 } // namespace Epidemic

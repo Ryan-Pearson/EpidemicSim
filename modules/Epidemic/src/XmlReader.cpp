@@ -91,9 +91,9 @@ static Epidemic::Statistics::Distribution read_distribution_from_node(const pugi
    }
 }
 
-static std::unordered_map<Agent::Id, AgentConfiguration> read_agent_configs(const pugi::xml_node agentsNode)
+static std::unordered_map<AgentId, AgentConfiguration> read_agent_configs(const pugi::xml_node agentsNode)
 {
-   std::unordered_map<Agent::Id, AgentConfiguration> ret;
+   std::unordered_map<AgentId, AgentConfiguration> ret;
 
    for (pugi::xml_node agent = agentsNode.child(AGENT_NODE); agent; agent = agent.next_sibling(AGENT_NODE))
    {
@@ -104,9 +104,9 @@ static std::unordered_map<Agent::Id, AgentConfiguration> read_agent_configs(cons
    return ret;
 }
 
-static std::unordered_map<Building::Id, BuildingConfiguration> read_building_configs(const pugi::xml_node buildingsNode)
+static std::unordered_map<BuildingId, BuildingConfiguration> read_building_configs(const pugi::xml_node buildingsNode)
 {
-   std::unordered_map<Building::Id, BuildingConfiguration> ret;
+   std::unordered_map<BuildingId, BuildingConfiguration> ret;
 
    for (pugi::xml_node building = buildingsNode.child(BUILDING_NODE); building;
         building = building.next_sibling(BUILDING_NODE))
@@ -143,7 +143,7 @@ static std::unordered_map<Building::Id, BuildingConfiguration> read_building_con
       const auto maxX = boost::lexical_cast<double>(maxXStr);
       const auto maxY = boost::lexical_cast<double>(maxYStr);
 
-      std::unordered_map<Agent::Id, Statistics::Distribution> startingAgents;
+      std::unordered_map<AgentId, Statistics::Distribution> startingAgents;
       const auto startingAgentNodes = building.child("StartingAgents");
       if (startingAgentNodes)
       {
@@ -163,16 +163,16 @@ static std::unordered_map<Building::Id, BuildingConfiguration> read_building_con
    return ret;
 }
 
-static std::unordered_map<Community::Id, CommunityConfiguration> read_community_configs(
+static std::unordered_map<CommunityId, CommunityConfiguration> read_community_configs(
    const pugi::xml_node communitiesNode)
 {
-   std::unordered_map<Community::Id, CommunityConfiguration> ret;
+   std::unordered_map<CommunityId, CommunityConfiguration> ret;
 
    for (pugi::xml_node community = communitiesNode.child(COMMUNITY_NODE); community;
         community = community.next_sibling(COMMUNITY_NODE))
    {
       const std::string communityName = community.attribute("name").value();
-      std::unordered_map<Building::Id, Statistics::Distribution> buildings;
+      std::unordered_map<BuildingId, Statistics::Distribution> buildings;
       for (pugi::xml_node buildingNode = community.child("Building"); buildingNode;
            buildingNode = buildingNode.next_sibling("Building"))
       {
@@ -187,9 +187,9 @@ static std::unordered_map<Community::Id, CommunityConfiguration> read_community_
    return ret;
 }
 
-static std::unordered_map<Community::Id, Statistics::Distribution> read_communinities(const pugi::xml_node worldNode)
+static std::unordered_map<CommunityId, Statistics::Distribution> read_communinities(const pugi::xml_node worldNode)
 {
-   std::unordered_map<Community::Id, Statistics::Distribution> ret;
+   std::unordered_map<CommunityId, Statistics::Distribution> ret;
 
    for (pugi::xml_node community = worldNode.child(COMMUNITY_NODE); community;
         community = community.next_sibling(COMMUNITY_NODE))

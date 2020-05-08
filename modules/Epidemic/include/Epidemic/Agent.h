@@ -9,25 +9,30 @@
 #include <string>
 #include <unordered_map>
 
+// Epidemic
+#include "Community.h"
+#include "Types.h"
+
 namespace Epidemic {
+
+class Building;
 
 class Agent
 {
 public:
-   using Id = int;
-   using Type = int;
+   static AgentType get_agent_type_by_name(const std::string& name);
 
-   static Type get_agent_type_by_name(const std::string& name);
+   explicit Agent(const std::string& agentName, Building* curBuilding, const Building::Position& curPosition);
 
-   explicit Agent(const std::string& agentName);
-
-   [[nodiscard]] constexpr Id get_id() const noexcept { return m_id; }
+   [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
 
 private:
-   Id m_id;
-   Type m_type;
+   AgentId m_id;
+   AgentType m_type;
+   Building* m_curBuilding;
+   Building::Position m_curPosition;
 
-   static std::unordered_map<std::string, Type> s_typeByName;
+   static std::unordered_map<std::string, AgentType> s_typeByName;
 };
 
 } // namespace Epidemic

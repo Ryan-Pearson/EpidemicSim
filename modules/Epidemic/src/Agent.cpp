@@ -2,12 +2,21 @@
 
 namespace Epidemic {
 
-static Agent::Id uniqueAgentId = -1;
-static Agent::Type uniqueAgentType = -1;
+static AgentId uniqueAgentId = -1;
+static AgentType uniqueAgentType = -1;
+std::unordered_map<std::string, AgentType> Agent::s_typeByName;
 
-Agent::Agent(const std::string& agentName) : m_id(++uniqueAgentId), m_type(get_agent_type_by_name(agentName)) { }
+Agent::Agent(const std::string& agentName, Building* curBuilding, const Building::Position& curPosition) :
+   m_id(++uniqueAgentId),
+   m_type(get_agent_type_by_name(agentName)),
+   m_curBuilding(curBuilding),
+   m_curPosition(curPosition)
+{
+   (void)m_curPosition;
+   (void)m_curBuilding;
+}
 
-Agent::Type Agent::get_agent_type_by_name(const std::string& name)
+AgentType Agent::get_agent_type_by_name(const std::string& name)
 {
    auto it = s_typeByName.find(name);
    if (it == s_typeByName.cend())

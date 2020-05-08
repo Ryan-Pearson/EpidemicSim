@@ -2,15 +2,15 @@
 
 namespace Epidemic {
 
-static Community::Id uniqueCommunityId = -1;
-static Community::Type uniqueCommunityType = -1;
-std::unordered_map<std::string, Community::Type> Community::s_typeByName;
+static CommunityId uniqueCommunityId = -1;
+static CommunityType uniqueCommunityType = -1;
+std::unordered_map<std::string, CommunityType> Community::s_typeByName;
 
 Community::Community(BuildingByTypeMap buildings) : m_id(++uniqueCommunityId), m_buildings(std::move(buildings))
 {
 }
 
-Community::Type Community::get_community_type_by_name(const std::string& name)
+CommunityType Community::get_community_type_by_name(const std::string& name)
 {
    auto it = s_typeByName.find(name);
    if (it == s_typeByName.cend())
