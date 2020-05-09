@@ -30,7 +30,7 @@ public:
    std::pair<Timestep, SIRD_Levels> run_timestep();
 
 private:
-   Timestep m_curTimestep =-1;
+   Timestep m_curTimestep = 0;
    SIRD_Levels m_curLevels;
    std::vector<Community> m_communities;
    std::vector<Agent> m_agents;
