@@ -57,4 +57,31 @@ void Building::agent_leaves_building(AgentId agent)
    }
 }
 
+std::vector<std::pair<AgentId, Building::Distance>> Building::get_nearby_agents(
+   const Distance distance, const AgentId agentId) const
+{
+   std::vector<std::pair<AgentId, Building::Distance>> ret;
+
+   const auto norm2 = [](const Position x, const Position y) {
+      const Distance xDist = x.m_x - y.m_x;
+      const Distance yDist = x.m_y - y.m_y;
+      return std::sqrt(xDist * xDist + yDist * yDist);
+   };
+
+   const auto agentPosition = m_curAgents.at(agentId);
+   for (const auto& agentAndPositionToCheck : m_curAgents)
+   {
+      const AgentId agentIdToCheck = agentAndPositionToCheck.first;
+      const Position agentPositionToCheck = agentAndPositionToCheck.second;
+      const Distance distanceBetween = norm2(agentPosition, agentPositionToCheck);
+
+      if ((agentIdToCheck != agentId) && (distanceBetween < distance))
+      {
+         ret.emplace_back(std::make_pair(agentIdToCheck, distanceBetween));
+      }
+   }
+
+   return ret;
+}
+
 } // namespace Epidemic

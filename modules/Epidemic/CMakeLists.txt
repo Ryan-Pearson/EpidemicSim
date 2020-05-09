@@ -15,6 +15,7 @@ add_library(Epidemic ${ModuleLibType}
         include/Epidemic/Building.h
         include/Epidemic/Community.h
         include/Epidemic/Distributions.h
+        include/Epidemic/SIRDStates.h
         include/Epidemic/Types.h
         include/Epidemic/World.h
         include/Epidemic/WorldBuilder.h
@@ -25,6 +26,7 @@ add_library(Epidemic ${ModuleLibType}
         src/Building.cpp
         src/Community.cpp
         src/Distributions.cpp
+        src/SIRDStates.cpp
         src/Types.cpp
         src/World.cpp
         src/WorldBuilder.cpp

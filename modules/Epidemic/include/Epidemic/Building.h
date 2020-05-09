@@ -18,10 +18,11 @@ namespace Epidemic {
 class Building
 {
 public:
+   using Distance = double;
    struct Position
    {
-      double m_x = 0.0;
-      double m_y = 0.0;
+      Distance m_x = 0.0;
+      Distance m_y = 0.0;
    };
 
    static BuildingType get_building_type_by_name(const std::string& name);
@@ -35,6 +36,8 @@ public:
    Position agent_enters_building(AgentId agent);
    void update_agent_position(AgentId agent, const Position& newPosition);
    void agent_leaves_building(AgentId agent);
+
+   std::vector<std::pair<AgentId, Distance>> get_nearby_agents(Distance distance, AgentId agentId) const;
 
 private:
    BuildingId m_id;

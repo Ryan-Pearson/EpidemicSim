@@ -31,7 +31,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
             const auto& buildingName = buildingConfig.m_name;
             auto buildingsEmplaceRet = buildings.emplace(buildingType, std::vector<Building> {});
 
-            if (buildingsEmplaceRet.second)
+            if (!buildingsEmplaceRet.second)
             {
                throw std::runtime_error("Invalid building configuration for a community");
             }

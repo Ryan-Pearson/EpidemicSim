@@ -3,6 +3,7 @@
 
 // Epidemic
 #include "Epidemic/XmlReader.h"
+#include "Epidemic/WorldBuilder.h"
 
 void handle_eptr(std::exception_ptr eptr)
 {
@@ -26,6 +27,7 @@ int main()
    {
       const std::string fullFilePath = "/Users/pearsrs1/EpidemicSim/test_input.xml";
       const auto worldConfiguration = Epidemic::get_world_config_from_xml(fullFilePath);
+      const auto world = Epidemic::build_world(worldConfiguration);
    }
    catch (...)
    {

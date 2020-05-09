@@ -12,6 +12,7 @@
 // Epidemic
 #include "Community.h"
 #include "Types.h"
+#include "SIRDStates.h"
 
 namespace Epidemic {
 
@@ -26,9 +27,12 @@ public:
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
 
+   std::vector<AgentId> infect_nearby_agents() const;
+
 private:
    AgentId m_id;
    AgentType m_type;
+   SIRD m_currentState = SirdState::Susceptible{};
    Building* m_curBuilding;
    Building::Position m_curPosition;
 
