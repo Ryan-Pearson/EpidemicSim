@@ -4,12 +4,15 @@
 
 #include "Epidemic/WorldBuilder.h"
 
+// STL
+#include <unordered_set>
+
 namespace Epidemic {
 
 World build_world(const WorldConfiguration& worldConfiguration)
 {
-   std::unordered_map<CommunityId, Community> communities;
-   std::unordered_map<AgentId, Agent> agents;
+   std::vector<Community> communities;
+   std::vector<Agent> agents;
 
    for (const auto& communityTypeAndDistribution : worldConfiguration.m_communities)
    {
@@ -71,17 +74,32 @@ World build_world(const WorldConfiguration& worldConfiguration)
                         curBuildingYDist(Statistics::GLOBAL_RANDOM_ENGINE)};
                      Agent newAgent(agentConfig.m_name, &curBuilding, agentStartingPosition);
                      const AgentId agentId = newAgent.get_id();
-                     curBuilding.agent_enters_building(newAgent.get_id());
-                     curBuilding.update_agent_position(newAgent.get_id(), agentStartingPosition);
-                     agents.emplace(agentId, newAgent);
+                     curBuilding.agent_enters_building(agentId);
+                     curBuilding.update_agent_position(agentId, agentStartingPosition);
+                     assert(agentId == static_cast<int>(agents.size()));
+                     agents.emplace_back(std::move(newAgent));
                   }
                }
             }
          }
 
          Community newCommunity(std::move(buildings));
-         communities.emplace(newCommunity.get_id(), std::move(newCommunity));
+         assert(newCommunity.get_id() == static_cast<int>(communities.size()));
+         communities.emplace_back(std::move(newCommunity));
       }
+   }
+
+   int numToInfect = std::min(worldConfiguration.m_initialInfectionSize, static_cast<int>(agents.size()));
+   std::uniform_int_distribution<> agentPicker(0, static_cast<int>(agents.size()));
+   std::unordered_set<int> toInfect;
+   while (static_cast<int>(toInfect.size()) < numToInfect)
+   {
+      toInfect.insert(agentPicker(Statistics::GLOBAL_RANDOM_ENGINE));
+   }
+
+   for (const AgentId agentToInfect : toInfect)
+   {
+      agents[agentToInfect].attempt_infection(0);
    }
 
    return World(std::move(communities), std::move(agents));

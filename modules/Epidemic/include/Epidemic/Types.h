@@ -7,6 +7,8 @@
 
 namespace Epidemic {
 
+using Timestep = int;
+
 using AgentId = int;
 using AgentType = int;
 
@@ -15,6 +17,12 @@ using BuildingType = int;
 
 using CommunityId = int;
 using CommunityType = int;
+
+// Globals
+// TODO: Make better / remove
+constexpr double TIMESTEP_TO_TIME_IN_SEC = 1.0;
+constexpr double AGENT_SPEED = 2.93333; // 2.93333 ft/s ~= 2 mph
+constexpr Timestep INFECTION_LENGTH = static_cast<Timestep>(2.0 * 7.0 * 24.0 * 60.0 * 60.0 / TIMESTEP_TO_TIME_IN_SEC);
 
 } // namespace Epidemic
 

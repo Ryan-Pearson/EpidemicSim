@@ -7,6 +7,7 @@
 
 // STL
 #include <string>
+#include <optional>
 #include <unordered_map>
 
 // Epidemic
@@ -26,8 +27,13 @@ public:
    explicit Agent(const std::string& agentName, Building* curBuilding, const Building::Position& curPosition);
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
+   [[nodiscard]] SIRD get_SIRD_state() const & noexcept { return m_currentState; }
+   [[nodiscard]] const SIRD& get_SIRD_state() && noexcept { return m_currentState; }
 
-   std::vector<AgentId> infect_nearby_agents() const;
+   void update_agent_state(Timestep curTimeStep);
+   void move_agent();
+   void attempt_infection(Timestep curTimeStep);
+   [[nodiscard]] std::vector<AgentId> get_nearby_agents_to_infect() const;
 
 private:
    AgentId m_id;

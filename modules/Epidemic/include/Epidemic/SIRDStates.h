@@ -8,6 +8,9 @@
 // STL
 #include <variant>
 
+// Epidemic
+#include "Types.h"
+
 namespace Epidemic {
 namespace SirdState {
 
@@ -17,15 +20,18 @@ namespace SirdState {
 
    struct Infectious
    {
+      Timestep m_infectionEndTime;
    };
 
    struct Recovered
    {
+      Timestep m_timeRecovered;
    };
 
    struct Deceased
    {
    };
+
 } // namespace SirdState
 
 using SIRD = std::variant<SirdState::Susceptible, SirdState::Infectious, SirdState::Recovered, SirdState::Deceased>;

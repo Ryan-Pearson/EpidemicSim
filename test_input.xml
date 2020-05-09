@@ -187,6 +187,7 @@
 	</Communities>
 
 	<WorldConfiguration>
+		<InitialInfectionSize> 20 </InitialInfectionSize>
 		<Community name="Large">
 			<Fixed> 1 </Fixed>
 		</Community>
