@@ -17,6 +17,11 @@ Building::Building(const std::string& buildingName, const Position& maxPosition)
 {
 }
 
+BuildingId get_next_building_id()
+{
+   return uniqueBuildingId + 1;
+}
+
 BuildingType Building::get_building_type_by_name(const std::string& name)
 {
    auto it = s_typeByName.find(name);

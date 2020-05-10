@@ -36,7 +36,7 @@ class Agent
 public:
    static AgentType get_agent_type_by_name(const std::string& name);
 
-   explicit Agent(const std::string& agentName, Building* curBuilding, const Building::Position& curPosition);
+   explicit Agent(const std::string& agentName, boost::container::flat_map<Timestep, AgentMovementInfo> locations);
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
    [[nodiscard]] SIRD get_SIRD_state() const & noexcept { return m_currentState; }

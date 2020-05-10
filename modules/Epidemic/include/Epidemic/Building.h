@@ -26,6 +26,7 @@ public:
    };
 
    static BuildingType get_building_type_by_name(const std::string& name);
+   static BuildingId get_next_building_id();
 
    explicit Building(const std::string& buildingName, const Position& maxPosition);
 

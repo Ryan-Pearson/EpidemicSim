@@ -40,7 +40,7 @@ std::pair<Timestep, World::SIRD_Levels> World::run_timestep()
    for (auto& agent : m_agents)
    {
       agent.update_agent_state(m_curTimestep);
-      agent.move_agent();
+      agent.move_agent(m_curTimestep);
       const auto agentsToInfect = agent.get_nearby_agents_to_infect();
       m_cache_agentsToInfect.insert(m_cache_agentsToInfect.end(), agentsToInfect.cbegin(), agentsToInfect.cend());
    }

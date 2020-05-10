@@ -10,6 +10,11 @@ Community::Community(BuildingByTypeMap buildings) : m_id(++uniqueCommunityId), m
 {
 }
 
+CommunityId Community::get_next_community_id()
+{
+   return uniqueCommunityId + 1;
+}
+
 CommunityType Community::get_community_type_by_name(const std::string& name)
 {
    auto it = s_typeByName.find(name);

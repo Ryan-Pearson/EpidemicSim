@@ -91,6 +91,61 @@ static Epidemic::Statistics::Distribution read_distribution_from_node(const pugi
    }
 }
 
+static std::pair<Timestep, AgentMovementConfiguration> get_location_info_from_node(const pugi::xml_node node)
+{
+   const std::string startTimeStr = node.attribute("start").value();
+   const auto startTime =
+      static_cast<Timestep>(boost::lexical_cast<double>(startTimeStr) * TIME_IN_HOUR_TO_TIMESTEP + 1e-6);
+   if (strcmp(node.name(), "Fixed") == 0)
+   {
+      std::string fixedText = node.child_value();
+      boost::algorithm::trim(fixedText);
+      return std::make_pair(startTime,
+         AgentMovementConfiguration {Epidemic::Statistics::Fixed {0},
+            boost::container::small_vector<std::string, 10> {fixedText}, std::nullopt});
+   }
+   else if (strcmp(node.name(), "PDF") == 0)
+   {
+      const auto lambdaAttribute = node.attribute("lambda");
+      const std::optional<double> lambda =
+         lambdaAttribute ? std::optional<double> {boost::lexical_cast<double>(lambdaAttribute.value())} : std::nullopt;
+
+      const auto stringIsEmpty = [](const std::string& toCheck) { return toCheck.empty(); };
+      std::vector<std::string> entries;
+      boost::algorithm::split(entries, node.child_value(), boost::is_any_of("\n\r\t "), boost::token_compress_on);
+      entries.erase(std::remove_if(entries.begin(), entries.end(), stringIsEmpty), entries.cend());
+
+      if (entries.size() % 2 != 0)
+      {
+         throw std::runtime_error(
+            fmt::format("Read in pdf with {} entries, entries must be divisible by 2", entries.size()));
+      }
+
+      boost::container::flat_map<int, int> numberToWeightMap;
+      boost::container::small_vector<std::string, 10> locations;
+      locations.reserve(entries.size() / 2);
+      numberToWeightMap.reserve(entries.size() / 2);
+      for (size_t i = 0; i < entries.size(); i += 2)
+      {
+         locations.emplace_back(entries[i]);
+         const int number = boost::lexical_cast<int>(i);
+         const int weight = boost::lexical_cast<int>(entries[i + 1]);
+         const auto emplaceRet = numberToWeightMap.emplace(number, weight);
+
+         if (!emplaceRet.second)
+         {
+            throw std::runtime_error(fmt::format("Error creating valid PDF values for node {}", node.name()));
+         }
+      }
+      return std::make_pair(startTime,
+         AgentMovementConfiguration {Epidemic::Statistics::PDF {numberToWeightMap}, std::move(locations), lambda});
+   }
+   else
+   {
+      throw std::runtime_error("Invalid location node format");
+   }
+}
+
 static std::unordered_map<AgentId, AgentConfiguration> read_agent_configs(const pugi::xml_node agentsNode)
 {
    std::unordered_map<AgentId, AgentConfiguration> ret;
@@ -98,7 +153,27 @@ static std::unordered_map<AgentId, AgentConfiguration> read_agent_configs(const 
    for (pugi::xml_node agent = agentsNode.child(AGENT_NODE); agent; agent = agent.next_sibling(AGENT_NODE))
    {
       const std::string agentName = agent.attribute("name").value();
-      ret.emplace(Agent::get_agent_type_by_name(agentName), AgentConfiguration {agentName});
+
+      const pugi::xml_node locationsNode = agent.child("Locations");
+      if (!locationsNode)
+      {
+         throw std::runtime_error("Could not find locations for agent");
+      }
+
+      const pugi::xml_node regularLocations = locationsNode.child("Regular");
+      if (!regularLocations)
+      {
+         throw std::runtime_error("Could not find regular locations for agent");
+      }
+
+      boost::container::flat_map<Timestep, AgentMovementConfiguration> locationMap;
+      const auto locations = regularLocations.children();
+      for (const auto location : locations)
+      {
+         locationMap.insert(get_location_info_from_node(location));
+      }
+
+      ret.emplace(Agent::get_agent_type_by_name(agentName), AgentConfiguration {agentName, std::move(locationMap)});
    }
 
    return ret;

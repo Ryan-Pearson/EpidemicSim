@@ -9,9 +9,17 @@
 
 namespace Epidemic {
 
+struct AgentMovementConfiguration
+{
+   Statistics::Distribution m_locationIdx;
+   boost::container::small_vector<std::string, 10> m_locations;
+   std::optional<double> m_lambda;
+};
+
 struct AgentConfiguration
 {
    std::string m_name;
+   boost::container::flat_map<Timestep, AgentMovementConfiguration> m_locations;
 };
 
 struct BuildingConfiguration

@@ -11,8 +11,16 @@ namespace Epidemic {
 
 World build_world(const WorldConfiguration& worldConfiguration)
 {
+   struct BuildingSpawnInfo
+   {
+      CommunityId m_community;
+      Building* m_building;
+      const std::unordered_map<AgentType, Statistics::Distribution>* m_agents;
+   };
+
    std::vector<Community> communities;
    std::vector<Agent> agents;
+   std::vector<BuildingSpawnInfo> agentsInBuildingToSpawn;
 
    for (const auto& communityTypeAndDistribution : worldConfiguration.m_communities)
    {
@@ -57,28 +65,10 @@ World build_world(const WorldConfiguration& worldConfiguration)
                containerOfBuildingsOfThisType.emplace_back(buildingName, maxPosition);
                auto& curBuilding = containerOfBuildingsOfThisType.back();
 
-               std::uniform_int_distribution curBuildingXDist(0.0, maxPosition.m_x);
-               std::uniform_int_distribution curBuildingYDist(0.0, maxPosition.m_y);
-
-               for (const auto& agentTypeAndDistribution : buildingConfig.m_agents)
+               if (!buildingConfig.m_agents.empty())
                {
-                  const AgentId agentType = agentTypeAndDistribution.first;
-                  const auto& agentDistribution = agentTypeAndDistribution.second;
-
-                  const auto& agentConfig = worldConfiguration.m_agentConfigs.at(agentType);
-
-                  const int numAgentsToSpawn = std::max(0, Statistics::sample_distribution(agentDistribution));
-                  for (int curAgentCount = 0; curAgentCount < numAgentsToSpawn; ++curAgentCount)
-                  {
-                     const Building::Position agentStartingPosition {curBuildingXDist(Statistics::GLOBAL_RANDOM_ENGINE),
-                        curBuildingYDist(Statistics::GLOBAL_RANDOM_ENGINE)};
-                     Agent newAgent(agentConfig.m_name, &curBuilding, agentStartingPosition);
-                     const AgentId agentId = newAgent.get_id();
-                     curBuilding.agent_enters_building(agentId);
-                     curBuilding.update_agent_position(agentId, agentStartingPosition);
-                     assert(agentId == static_cast<int>(agents.size()));
-                     agents.emplace_back(std::move(newAgent));
-                  }
+                  agentsInBuildingToSpawn.emplace_back(
+                     BuildingSpawnInfo {Community::get_next_community_id(), &curBuilding, &buildingConfig.m_agents});
                }
             }
          }
@@ -86,6 +76,60 @@ World build_world(const WorldConfiguration& worldConfiguration)
          Community newCommunity(std::move(buildings));
          assert(newCommunity.get_id() == static_cast<int>(communities.size()));
          communities.emplace_back(std::move(newCommunity));
+      }
+   }
+
+   for (const auto& buildingSpawnInfo : agentsInBuildingToSpawn)
+   {
+      const auto& maxPosition = buildingSpawnInfo.m_building->get_max_position();
+      std::uniform_int_distribution curBuildingXDist(0.0, maxPosition.m_x);
+      std::uniform_int_distribution curBuildingYDist(0.0, maxPosition.m_y);
+
+      const auto& community = communities[buildingSpawnInfo.m_community];
+
+      for (const auto& agentSpawnInfo : *buildingSpawnInfo.m_agents)
+      {
+         const AgentId agentType = agentSpawnInfo.first;
+         const auto& agentDistribution = agentSpawnInfo.second;
+
+         const auto& agentConfig = worldConfiguration.m_agentConfigs.at(agentType);
+         const auto& locationConfig = agentConfig.m_locations;
+
+         const int numAgentsToSpawn = std::max(0, Statistics::sample_distribution(agentDistribution));
+         for (int curAgentCount = 0; curAgentCount < numAgentsToSpawn; ++curAgentCount)
+         {
+            const auto movementConfigMapToInfoMap = [&](const auto& mapPairIn) {
+               const auto movementConfigToInfo = [&](const AgentMovementConfiguration& config) {
+                  const auto sampleRandomBuilding = [&](const std::string& buildingName) -> Building* {
+                     if (buildingName == "SpawnLocation")
+                     {
+                        return buildingSpawnInfo.m_building;
+                     }
+                     else
+                     {
+                        const auto& buildingList =
+                           community.get_buildings_of_type(Building::get_building_type_by_name(buildingName));
+                        std::uniform_int_distribution<> dis(0, buildingList.size() - 1);
+                        // TODO: Const cast
+                        return const_cast<Building*>(&buildingList[dis(Statistics::GLOBAL_RANDOM_ENGINE)]);
+                     }
+                  };
+
+                  boost::container::small_vector<Building*, 10> buildingPtrs;
+                  std::transform(config.m_locations.cbegin(), config.m_locations.cend(),
+                     std::inserter(buildingPtrs, buildingPtrs.end()), sampleRandomBuilding);
+                  return AgentMovementInfo {config.m_locationIdx, std::move(buildingPtrs), config.m_lambda};
+               };
+
+               return std::make_pair(mapPairIn.first, movementConfigToInfo(mapPairIn.second));
+            };
+
+            boost::container::flat_map<Timestep, AgentMovementInfo> locations;
+            std::transform(locationConfig.cbegin(), locationConfig.cend(), std::inserter(locations, locations.end()),
+               movementConfigMapToInfoMap);
+
+            agents.emplace_back(Agent(agentConfig.m_name, std::move(locations)));
+         }
       }
    }
 
