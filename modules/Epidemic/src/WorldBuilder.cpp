@@ -60,7 +60,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
             for (int curBuildingCount = 0; curBuildingCount < numBuildingsToSpawn; ++curBuildingCount)
             {
                const Building::Position maxPosition {
-                  xDist(Statistics::GLOBAL_RANDOM_ENGINE), yDist(Statistics::GLOBAL_RANDOM_ENGINE)};
+                  xDist(Statistics::get_global_random_engine()), yDist(Statistics::get_global_random_engine())};
 
                containerOfBuildingsOfThisType.emplace_back(buildingName, maxPosition);
                auto& curBuilding = containerOfBuildingsOfThisType.back();
@@ -111,7 +111,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
                            community.get_buildings_of_type(Building::get_building_type_by_name(buildingName));
                         std::uniform_int_distribution<> dis(0, buildingList.size() - 1);
                         // TODO: Const cast
-                        return const_cast<Building*>(&buildingList[dis(Statistics::GLOBAL_RANDOM_ENGINE)]);
+                        return const_cast<Building*>(&buildingList[dis(Statistics::get_global_random_engine())]);
                      }
                   };
 
@@ -138,7 +138,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
    std::unordered_set<int> toInfect;
    while (static_cast<int>(toInfect.size()) < numToInfect)
    {
-      toInfect.insert(agentPicker(Statistics::GLOBAL_RANDOM_ENGINE));
+      toInfect.insert(agentPicker(Statistics::get_global_random_engine()));
    }
 
    for (const AgentId agentToInfect : toInfect)

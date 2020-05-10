@@ -6,12 +6,12 @@ static std::vector<std::pair<double, double>> generate_random_movement_vector(co
 {
    std::vector<std::pair<double, double>> ret;
 
-   std::uniform_real_distribution<> randomAngleDistribution(0, 2.0 * M_PI);
+   std::uniform_real_distribution<> randomAngleDistribution(0.0, 2.0 * M_PI);
    ret.reserve(toGenerate);
 
    for (size_t i = 0; i < toGenerate; ++i)
    {
-      const double randomAngle = randomAngleDistribution(Statistics::GLOBAL_RANDOM_ENGINE);
+      const double randomAngle = randomAngleDistribution(Statistics::get_global_random_engine());
       const double sinX = std::sin(randomAngle);
       const double cosX = std::cos(randomAngle);
       ret.emplace_back(sinX, cosX);
@@ -34,13 +34,16 @@ Agent::Agent(const std::string& agentName, boost::container::flat_map<Timestep, 
 {
    std::uniform_int_distribution<> randStart(0, numRandomMovements);
    std::uniform_int_distribution<> randStride(0, std::min(50, static_cast<int>(numRandomMovements / 2)));
-   m_nextRandomMovementIdx = randStart(Statistics::GLOBAL_RANDOM_ENGINE);
-   m_stride = randStride(Statistics::GLOBAL_RANDOM_ENGINE);
+   m_nextRandomMovementIdx = randStart(Statistics::get_global_random_engine());
+   m_stride = randStride(Statistics::get_global_random_engine());
 
    const auto startLocationIt = m_locations.begin();
    const auto nextLocationIdx = Statistics::sample_distribution(startLocationIt->second.m_locationIdx);
    m_curBuilding = startLocationIt->second.m_locations[nextLocationIdx];
    m_curPosition = m_curBuilding->agent_enters_building(m_id);
+
+   const auto nextLocationIt = std::next(startLocationIt);
+   m_nextMovementTime = (nextLocationIt != m_locations.cend()) ? nextLocationIt->first : 0;
 }
 
 AgentType Agent::get_agent_type_by_name(const std::string& name)
@@ -72,7 +75,7 @@ std::vector<AgentId> Agent::get_nearby_agents_to_infect() const
 
       // TODO: Make better
       static std::normal_distribution infectionDist(0.0, 2.0);
-      const double draw = infectionDist(Statistics::GLOBAL_RANDOM_ENGINE);
+      const double draw = infectionDist(Statistics::get_global_random_engine());
       const bool infectionSuccessful = std::abs(draw) > distanceToAgent;
 
       if (infectionSuccessful)
@@ -131,7 +134,7 @@ void Agent::move_agent(const Timestep curTimeStep)
          const double lambdaTimestep = *locationInfo->second.m_lambda * TIME_IN_HOUR_TO_TIMESTEP;
          std::exponential_distribution exponentialDistribution(lambdaTimestep);
          const auto numTimestepsExponential =
-            static_cast<Timestep>(exponentialDistribution(Statistics::GLOBAL_RANDOM_ENGINE));
+            static_cast<Timestep>(exponentialDistribution(Statistics::get_global_random_engine()));
          m_nextMovementTime =
             ((numTimestepsExponential > nextLocationTimeInMap) || (numTimestepsExponential >= TIMESTEP_PER_DAY)) ?
             nextLocationTimeInMap :
@@ -144,8 +147,9 @@ void Agent::move_agent(const Timestep curTimeStep)
       const auto& maxPosition = m_curBuilding->get_max_position();
       const double distanceToMove = TIMESTEP_TO_TIME_IN_SEC * AGENT_SPEED;
 
-      const double yDelta = randomMovementVector[m_nextRandomMovementIdx].first * distanceToMove;
-      const double xDelta = randomMovementVector[m_nextRandomMovementIdx].second * distanceToMove;
+      const auto nextMovePair = randomMovementVector[m_nextRandomMovementIdx];
+      const double yDelta = nextMovePair.first * distanceToMove;
+      const double xDelta = nextMovePair.second * distanceToMove;
       m_nextRandomMovementIdx = (m_nextRandomMovementIdx + m_stride) % numRandomMovements;
 
       const double newX = std::clamp(m_curPosition.m_x + xDelta, 0.0, maxPosition.m_x);

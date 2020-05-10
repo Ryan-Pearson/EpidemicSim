@@ -35,12 +35,17 @@ std::pair<Timestep, World::SIRD_Levels> World::run_timestep()
 {
    ++m_curTimestep;
 
-   // Move and get infections to check
-   m_cache_agentsToInfect.clear();
+   // Update agent SIRD status and move them
    for (auto& agent : m_agents)
    {
       agent.update_agent_state(m_curTimestep);
       agent.move_agent(m_curTimestep);
+   }
+
+   // Check for nearby agents to infect
+   m_cache_agentsToInfect.clear();
+   for (auto& agent : m_agents)
+   {
       const auto agentsToInfect = agent.get_nearby_agents_to_infect();
       m_cache_agentsToInfect.insert(m_cache_agentsToInfect.end(), agentsToInfect.cbegin(), agentsToInfect.cend());
    }

@@ -20,7 +20,11 @@ namespace Statistics {
       return rng;
    }
 
-   std::mt19937 GLOBAL_RANDOM_ENGINE = seeded_random_engine();
+   std::mt19937& get_global_random_engine()
+   {
+      static std::mt19937 engine = seeded_random_engine();
+      return engine;
+   }
 
    PDF::PDF(const boost::container::flat_map<int, int>& numToWeight)
    {
@@ -40,8 +44,8 @@ namespace Statistics {
 
    int sample_distribution(const Distribution& dist) noexcept
    {
-      return std::visit(overloaded {[](PDF& pdf) { return pdf.m_numByIdx.at(pdf.m_dist(GLOBAL_RANDOM_ENGINE)); },
-                           [](Gaussian& gaussian) { return static_cast<int>(gaussian.m_dist(GLOBAL_RANDOM_ENGINE)); },
+      return std::visit(overloaded {[](PDF& pdf) { return pdf.m_numByIdx.at(pdf.m_dist(get_global_random_engine())); },
+                           [](Gaussian& gaussian) { return static_cast<int>(gaussian.m_dist(get_global_random_engine())); },
                            [](const Fixed& fixed) { return fixed.m_value; }},
          // TODO: Const cast, no bueno
          const_cast<Distribution&>(dist));

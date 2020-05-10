@@ -16,7 +16,7 @@
 namespace Epidemic {
 namespace Statistics {
 
-   extern std::mt19937 GLOBAL_RANDOM_ENGINE;
+   std::mt19937& get_global_random_engine();
 
    struct PDF
    {
