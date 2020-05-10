@@ -28,7 +28,7 @@ int main()
    std::exception_ptr eptr;
    try
    {
-      const std::string fullFilePath = "/Users/pearsrs1/EpidemicSim/test_input.xml";
+      const std::string fullFilePath = "/Users/pearsrs1/EpidemicSim/test_input_small.xml";
       const auto worldConfiguration = Epidemic::get_world_config_from_xml(fullFilePath);
       auto world = Epidemic::build_world(worldConfiguration);
 
@@ -45,13 +45,13 @@ int main()
       while (numInfectious > 0)
       {
          std::tie(curTime, worldStats) = world.run_timestep();
-         if ((curTime % 1440) == 0)
+         if ((curTime % (1440 * 60)) == 0)
          {
             logStats(curTime, worldStats);
          }
          numInfectious = worldStats.m_numInfectious;
       }
-      
+
       logStats(curTime, worldStats);
       std::cout << "Simulation complete" << std::endl;
    }

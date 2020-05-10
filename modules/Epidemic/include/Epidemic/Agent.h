@@ -6,6 +6,7 @@
 #define EPIDEMIC_SIM_AGENT_H
 
 // STL
+#include <array>
 #include <string>
 #include <optional>
 #include <unordered_map>
@@ -41,6 +42,9 @@ private:
    SIRD m_currentState = SirdState::Susceptible{};
    Building* m_curBuilding;
    Building::Position m_curPosition;
+
+   size_t m_nextRandomMovementIdx;
+   size_t m_stride;
 
    static std::unordered_map<std::string, AgentType> s_typeByName;
 };

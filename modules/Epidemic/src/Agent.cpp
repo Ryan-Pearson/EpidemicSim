@@ -2,8 +2,29 @@
 
 namespace Epidemic {
 
+static std::vector<std::pair<double, double>> generate_random_movement_vector(const size_t toGenerate)
+{
+   std::vector<std::pair<double, double>> ret;
+
+   std::uniform_real_distribution<> randomAngleDistribution(0, 2.0 * M_PI);
+   ret.reserve(toGenerate);
+
+   for (size_t i = 0; i < toGenerate; ++i)
+   {
+      const double randomAngle = randomAngleDistribution(Statistics::GLOBAL_RANDOM_ENGINE);
+      const double sinX = std::sin(randomAngle);
+      const double cosX = std::cos(randomAngle);
+      ret.emplace_back(sinX, cosX);
+   }
+
+   return ret;
+}
+
 static AgentId uniqueAgentId = -1;
 static AgentType uniqueAgentType = -1;
+constexpr size_t numRandomMovements = 100000;
+static const std::vector<std::pair<double, double>> randomMovementVector =
+   generate_random_movement_vector(numRandomMovements);
 std::unordered_map<std::string, AgentType> Agent::s_typeByName;
 
 constexpr double MAX_INFECTION_RADIUS = 10.0;
@@ -14,8 +35,10 @@ Agent::Agent(const std::string& agentName, Building* curBuilding, const Building
    m_curBuilding(curBuilding),
    m_curPosition(curPosition)
 {
-   (void)m_curPosition;
-   (void)m_curBuilding;
+   std::uniform_int_distribution<> randStart(0, numRandomMovements);
+   std::uniform_int_distribution<> randStride(0, std::min(50, static_cast<int>(numRandomMovements / 2)));
+   m_nextRandomMovementIdx = randStart(Statistics::GLOBAL_RANDOM_ENGINE);
+   m_stride = randStride(Statistics::GLOBAL_RANDOM_ENGINE);
 }
 
 AgentType Agent::get_agent_type_by_name(const std::string& name)
@@ -86,11 +109,9 @@ void Agent::move_agent()
    const auto& maxPosition = m_curBuilding->get_max_position();
    const double distanceToMove = TIMESTEP_TO_TIME_IN_SEC * AGENT_SPEED;
 
-   std::uniform_real_distribution<> randomAngleDistribution(0, 2.0 * M_PI);
-   const double randomAngle = randomAngleDistribution(Statistics::GLOBAL_RANDOM_ENGINE);
-
-   const double yDelta = std::sin(randomAngle) * distanceToMove;
-   const double xDelta = std::cos(randomAngle) * distanceToMove;
+   const double yDelta = randomMovementVector[m_nextRandomMovementIdx].first * distanceToMove;
+   const double xDelta = randomMovementVector[m_nextRandomMovementIdx].second * distanceToMove;
+   m_nextRandomMovementIdx = (m_nextRandomMovementIdx + m_stride) % numRandomMovements;
 
    const double newX = std::clamp(m_curPosition.m_x + xDelta, 0.0, maxPosition.m_x);
    const double newY = std::clamp(m_curPosition.m_y + yDelta, 0.0, maxPosition.m_y);
