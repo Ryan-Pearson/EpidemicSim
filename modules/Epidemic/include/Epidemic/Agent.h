@@ -11,6 +11,10 @@
 #include <optional>
 #include <unordered_map>
 
+// Boost
+#include <boost/container/flat_map.hpp>
+#include <boost/container/small_vector.hpp>
+
 // Epidemic
 #include "Community.h"
 #include "Types.h"
@@ -19,6 +23,13 @@
 namespace Epidemic {
 
 class Building;
+
+struct AgentMovementInfo
+{
+   Statistics::Distribution m_locationIdx;
+   boost::container::small_vector<Building*, 10> m_locations;
+   std::optional<double> m_lambda;
+};
 
 class Agent
 {
@@ -32,7 +43,7 @@ public:
    [[nodiscard]] const SIRD& get_SIRD_state() && noexcept { return m_currentState; }
 
    void update_agent_state(Timestep curTimeStep);
-   void move_agent();
+   void move_agent(Timestep curTimeStep);
    void attempt_infection(Timestep curTimeStep);
    [[nodiscard]] std::vector<AgentId> get_nearby_agents_to_infect() const;
 
@@ -41,7 +52,9 @@ private:
    AgentType m_type;
    SIRD m_currentState = SirdState::Susceptible{};
    Building* m_curBuilding;
+   Timestep m_nextMovementTime = 0;
    Building::Position m_curPosition;
+   boost::container::flat_map<Timestep, AgentMovementInfo> m_locations;
 
    size_t m_nextRandomMovementIdx;
    size_t m_stride;

@@ -3,8 +3,53 @@
 	
 	<Agents>
 		<Agent name="Working Adult">
+			<Locations>
+				<Regular>
+					<Fixed start="0">
+						SpawnLocation
+					</Fixed>
+					<Fixed start="7">
+						Office
+					</Fixed>
+					<PDF start="17" lambda="2">
+						Essential 25
+						Essential 25
+						NonEssential 5
+						NonEssential 5
+						NonEssential 5
+						NonEssential 5
+						NonEssential 5
+						SpawnLocation 25
+					</PDF>
+					<Fixed start="21">
+						SpawnLocation
+					</Fixed>
+				</Regular>
+			</Locations>
 		</Agent>
 		<Agent name="Child in School">
+			<Locations>
+				<Regular>
+					<Fixed start="0">
+						SpawnLocation
+					</Fixed>
+					<Fixed start="7">
+						School
+					</Fixed>
+					<PDF start="15" lambda="2">
+						Essential 10
+						NonEssential 5
+						NonEssential 10
+						NonEssential 10
+						NonEssential 10
+						NonEssential 10
+						SpawnLocation 35
+					</PDF>
+					<Fixed start="21">
+						SpawnLocation
+					</Fixed>
+				</Regular>
+			</Locations>
 		</Agent>
 	</Agents>
 
