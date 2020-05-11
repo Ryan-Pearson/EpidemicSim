@@ -19,6 +19,7 @@ struct AgentMovementConfiguration
 struct AgentConfiguration
 {
    std::string m_name;
+   double m_mortalityRate;
    boost::container::flat_map<Timestep, AgentMovementConfiguration> m_locations;
 };
 

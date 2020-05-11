@@ -36,7 +36,7 @@ class Agent
 public:
    static AgentType get_agent_type_by_name(const std::string& name);
 
-   explicit Agent(const std::string& agentName, boost::container::flat_map<Timestep, AgentMovementInfo> locations);
+   explicit Agent(const std::string& agentName, boost::container::flat_map<Timestep, AgentMovementInfo> locations, double mortalityRate);
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
    [[nodiscard]] SIRD get_SIRD_state() const& noexcept { return m_currentState; }
@@ -58,7 +58,7 @@ private:
    Timestep m_nextMovementTime = 0;
    Building::Position m_curPosition;
    boost::container::flat_map<Timestep, AgentMovementInfo> m_locations;
-   double m_pDeath = 0.5;
+   double m_mortalityRate;
 
    size_t m_nextRandomMovementIdx;
    size_t m_stride;

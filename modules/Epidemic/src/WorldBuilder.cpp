@@ -129,7 +129,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
             std::transform(locationConfig.cbegin(), locationConfig.cend(), std::inserter(locations, locations.end()),
                movementConfigMapToInfoMap);
 
-            agents.emplace_back(Agent(agentConfig.m_name, std::move(locations)));
+            agents.emplace_back(Agent(agentConfig.m_name, std::move(locations), agentConfig.m_mortalityRate));
          }
       }
    }

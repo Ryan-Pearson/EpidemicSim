@@ -151,7 +151,16 @@ static std::unordered_map<AgentId, AgentConfiguration> read_agent_configs(const 
 
    for (pugi::xml_node agent = agentsNode.child(AGENT_NODE); agent; agent = agent.next_sibling(AGENT_NODE))
    {
-      const std::string agentName = agent.attribute("name").value();
+      const pugi::xml_attribute agentNameAttribute = agent.attribute("name");
+      const pugi::xml_attribute mortalityRateAttribute = agent.attribute("mortality_rate");
+
+      if (!agentNameAttribute || !mortalityRateAttribute)
+      {
+         throw std::runtime_error("Agents must have valid name and mortality_rate attributes");
+      }
+
+      const std::string agentName = agentNameAttribute.value();
+      const auto mortalityRate = boost::lexical_cast<double>(mortalityRateAttribute.value());
 
       const pugi::xml_node locationsNode = agent.child("Locations");
       if (!locationsNode)
@@ -172,7 +181,8 @@ static std::unordered_map<AgentId, AgentConfiguration> read_agent_configs(const 
          locationMap.insert(get_location_info_from_node(location));
       }
 
-      ret.emplace(Agent::get_agent_type_by_name(agentName), AgentConfiguration {agentName, std::move(locationMap)});
+      ret.emplace(Agent::get_agent_type_by_name(agentName),
+         AgentConfiguration {agentName, mortalityRate, std::move(locationMap)});
    }
 
    return ret;

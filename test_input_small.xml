@@ -2,7 +2,7 @@
 <EpidemicSimulationConfig>
 	
 	<Agents>
-		<Agent name="Working Adult">
+		<Agent name="Working Adult" mortality_rate="0.02">
 			<Locations>
 				<Regular>
 					<Fixed start="0">
@@ -27,7 +27,7 @@
 				</Regular>
 			</Locations>
 		</Agent>
-		<Agent name="Child in School">
+		<Agent name="Child in School" mortality_rate="0.001">
 			<Locations>
 				<Regular>
 					<Fixed start="0">

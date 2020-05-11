@@ -61,16 +61,19 @@ std::pair<Timestep, World::SIRD_Levels> World::run_timestep()
    for (const auto agentToInfect : m_cache_agentsToInfect)
    {
       const auto numberOfDaysInfected = m_agents[agentToInfect].attempt_infection(m_curTimestep);
-      m_numberOfInfectionTimestepsRemaining += numberOfDaysInfected.value_or(0);
-      ++numberInfectedThisDay;
+      if (numberOfDaysInfected)
+      {
+         m_numberOfInfectionTimestepsRemaining += numberOfDaysInfected.value();
+         ++numberInfectedThisDay;
+      }
    }
 
    if ((m_curTimestep % TIMESTEP_PER_DAY) == 0)
    {
       const double daysRemaining =
          static_cast<double>(m_numberOfInfectionTimestepsRemaining) / static_cast<double>(TIMESTEP_PER_DAY);
-      m_curRLevel =
-         static_cast<double>(numberInfectedThisDay) / daysRemaining / static_cast<double>(m_curLevels.m_numInfectious);
+      m_curRLevel = static_cast<double>(numberInfectedThisDay) * daysRemaining
+         / static_cast<double>(std::max(size_t(1), m_curLevels.m_numInfectious));
       numberInfectedThisDay = 0;
    }
 

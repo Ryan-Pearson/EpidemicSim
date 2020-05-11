@@ -29,8 +29,13 @@ std::unordered_map<std::string, AgentType> Agent::s_typeByName;
 
 constexpr double MAX_INFECTION_RADIUS = 10.0;
 
-Agent::Agent(const std::string& agentName, boost::container::flat_map<Timestep, AgentMovementInfo> locations) :
-   m_id(++uniqueAgentId), m_type(get_agent_type_by_name(agentName)), m_locations(std::move(locations))
+Agent::Agent(const std::string& agentName,
+   boost::container::flat_map<Timestep, AgentMovementInfo> locations,
+   const double mortalityRate) :
+   m_id(++uniqueAgentId),
+   m_type(get_agent_type_by_name(agentName)),
+   m_locations(std::move(locations)),
+   m_mortalityRate(mortalityRate)
 {
    std::uniform_int_distribution<> randStart(0, numRandomMovements);
    std::uniform_int_distribution<> randStride(0, std::min(50, static_cast<int>(numRandomMovements / 2)));
@@ -109,13 +114,13 @@ void Agent::update_agent_state(const Timestep curTimeStep)
          std::uniform_real_distribution<> pkDraw(0.0, 1.0);
          const double draw = pkDraw(Statistics::get_global_random_engine());
 
-         if (draw < m_pDeath)
+         if (draw < m_mortalityRate)
          {
-            m_currentState = SirdState::Recovered {curTimeStep};
+            m_currentState = SirdState::Deceased {curTimeStep};
          }
          else
          {
-            m_currentState = SirdState::Deceased {curTimeStep};
+            m_currentState = SirdState::Recovered {curTimeStep};
          }
       }
    }
