@@ -10,3 +10,7 @@ target_link_libraries(EpidemicSim
         Epidemic
         ${CONAN_LIBS}
 )
+
+target_compile_definitions(EpidemicSim PRIVATE
+        BASE_DIR="${CMAKE_SOURCE_DIR}"
+)

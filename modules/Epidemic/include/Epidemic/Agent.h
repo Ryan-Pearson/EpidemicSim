@@ -41,7 +41,9 @@ public:
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
    [[nodiscard]] SIRD get_SIRD_state() const& noexcept { return m_currentState; }
    [[nodiscard]] const SIRD& get_SIRD_state() && noexcept { return m_currentState; }
+
    [[nodiscard]] BuildingId get_current_building_id() const noexcept { return m_curBuilding->get_id(); }
+   [[nodiscard]] Building::Position get_current_position() const noexcept { return m_curPosition; }
 
    void update_agent_state(Timestep curTimeStep);
    void move_agent(Timestep curTimeStep);
