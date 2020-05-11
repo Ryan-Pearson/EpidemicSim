@@ -101,8 +101,17 @@ void Agent::update_agent_state(const Timestep curTimeStep)
    {
       if (infectious->m_infectionEndTime < curTimeStep)
       {
-         // We are being generous... for now
-         m_currentState = SirdState::Recovered {curTimeStep};
+         std::uniform_real_distribution<> pkDraw(0.0, 1.0);
+         const double draw = pkDraw(Statistics::get_global_random_engine());
+
+         if (draw < m_pDeath)
+         {
+            m_currentState = SirdState::Recovered {curTimeStep};
+         }
+         else
+         {
+            m_currentState = SirdState::Deceased {curTimeStep};
+         }
       }
    }
 }

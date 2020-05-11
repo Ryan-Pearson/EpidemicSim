@@ -40,8 +40,8 @@ int main()
       std::ofstream buildingLog;
       std::ofstream positionLog;
       std::ofstream sirdLog(OUTPUT_ROOT + "/sirdLog.csv");
-      sirdLog << "Day,Susceptible,Infectious,Recovered,Dead,Infectious,Susceptible+Infectious,Susceptible+Infectious+"
-                 "Recovered,Susceptible+Infectious+Recovered+Dead\n";
+      sirdLog << "Day,Susceptible,Infectious,Recovered,Deceased,Infectious,Susceptible+Infectious,"
+                 "Susceptible+Infectious+Recovered,Susceptible+Infectious+Recovered+Deceased\n";
 
       if (AGENT_TO_LOG_DIAGNOSTICS)
       {

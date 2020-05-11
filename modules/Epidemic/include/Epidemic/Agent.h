@@ -58,6 +58,7 @@ private:
    Timestep m_nextMovementTime = 0;
    Building::Position m_curPosition;
    boost::container::flat_map<Timestep, AgentMovementInfo> m_locations;
+   double m_pDeath = 0.5;
 
    size_t m_nextRandomMovementIdx;
    size_t m_stride;

@@ -30,6 +30,7 @@ namespace SirdState {
 
    struct Deceased
    {
+      Timestep m_timeDeceased;
    };
 
 } // namespace SirdState
