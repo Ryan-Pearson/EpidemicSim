@@ -129,9 +129,9 @@ World build_world(const WorldConfiguration& worldConfiguration)
             std::transform(locationConfig.cbegin(), locationConfig.cend(), std::inserter(locations, locations.end()),
                movementConfigMapToInfoMap);
 
-            agents.emplace_back(
-               Agent(agentConfig.m_name, std::move(locations), worldConfiguration.m_infectionSymptomsLambda,
-                  worldConfiguration.m_infectionDurationLambda, agentConfig.m_mortalityRate));
+            agents.emplace_back(Agent(buildingSpawnInfo.m_building, agentConfig.m_name, std::move(locations),
+               worldConfiguration.m_infectionSymptomsLambda, worldConfiguration.m_infectionDurationLambda,
+               agentConfig.m_mortalityRate));
          }
       }
    }

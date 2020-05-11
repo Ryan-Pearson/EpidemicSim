@@ -29,13 +29,15 @@ std::unordered_map<std::string, AgentType> Agent::s_typeByName;
 
 constexpr double MAX_INFECTION_RADIUS = 10.0;
 
-Agent::Agent(const std::string& agentName,
+Agent::Agent(Building* spawnLocation,
+   const std::string& agentName,
    boost::container::flat_map<Timestep, AgentMovementInfo> locations,
    const double infectionSymptomsLambda,
    const double infectionDurationLambda,
    const double mortalityRate) :
    m_id(++uniqueAgentId),
    m_type(get_agent_type_by_name(agentName)),
+   m_spawnLocation(spawnLocation),
    m_infectionSymptomsLambda(infectionSymptomsLambda),
    m_infectionDurationLambda(infectionDurationLambda),
    m_mortalityRate(mortalityRate),
@@ -146,7 +148,21 @@ void Agent::move_agent(const Timestep curTimeStep)
    assert(m_curBuilding != nullptr);
 
    const auto timeOfDay = (curTimeStep % TIMESTEP_PER_DAY);
-   if (timeOfDay == m_nextMovementTime)
+   if (!m_quarantined)
+   {
+      if (const auto infectious = std::get_if<SirdState::Infectious>(&m_currentState))
+      {
+         if (infectious->m_symptomsShow <= curTimeStep)
+         {
+            m_quarantined = true;
+            m_curBuilding->agent_leaves_building(m_id);
+            m_curBuilding = m_spawnLocation;
+            m_curPosition = m_curBuilding->agent_enters_building(m_id);
+            m_nextMovementTime = std::numeric_limits<Timestep>::max();
+         }
+      }
+   }
+   else if (timeOfDay == m_nextMovementTime)
    {
       const auto locationInfo = m_locations.lower_bound(timeOfDay);
       const auto nextLocationIdx = Statistics::sample_distribution(locationInfo->second.m_locationIdx);
