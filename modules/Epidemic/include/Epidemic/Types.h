@@ -20,7 +20,7 @@ using CommunityType = int;
 
 // Globals
 // TODO: Make better / remove
-constexpr Timestep TIMESTEP_PER_HOUR = 60 * 60 / 5;
+constexpr Timestep TIMESTEP_PER_HOUR = 60 * 60;
 constexpr Timestep TIMESTEP_PER_DAY = TIMESTEP_PER_HOUR * 24;
 constexpr double TIMESTEP_TO_TIME_IN_SEC = 1.0 / (static_cast<double>(TIMESTEP_PER_HOUR) / (60.0 * 60.0));
 constexpr double TIMESTEP_TO_TIME_IN_HOUR = TIMESTEP_TO_TIME_IN_SEC / (60.0 * 60.0);
