@@ -20,6 +20,7 @@ namespace SirdState {
 
    struct Infectious
    {
+      Timestep m_symptomsShow;
       Timestep m_infectionEndTime;
    };
 

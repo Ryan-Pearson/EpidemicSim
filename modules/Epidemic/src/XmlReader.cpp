@@ -355,6 +355,30 @@ WorldConfiguration get_world_config_from_xml(const std::string& fullFilePath)
       throw std::runtime_error("Could not find XML Element InitialInfectionSize");
    }
 
+   const auto infectionSymptomsLambda = worldConfigNode.child("InfectionSymptomsLambda");
+   if (infectionSymptomsLambda)
+   {
+      std::string infectionSymptomsText = infectionSymptomsLambda.child_value();
+      boost::algorithm::trim(infectionSymptomsText);
+      ret.m_infectionSymptomsLambda = boost::lexical_cast<double>(infectionSymptomsText);
+   }
+   else
+   {
+      throw std::runtime_error("Could not find XML Element InfectionSymptomsLambda");
+   }
+
+   const auto infectionDurationLambda = worldConfigNode.child("InfectionDurationLambda");
+   if (infectionDurationLambda)
+   {
+      std::string infectionDurationText = infectionDurationLambda.child_value();
+      boost::algorithm::trim(infectionDurationText);
+      ret.m_infectionDurationLambda = boost::lexical_cast<double>(infectionDurationText);
+   }
+   else
+   {
+      throw std::runtime_error("Could not find XML Element InfectionDurationLambda");
+   }
+
    return ret;
 }
 

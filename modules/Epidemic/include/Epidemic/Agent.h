@@ -36,7 +36,11 @@ class Agent
 public:
    static AgentType get_agent_type_by_name(const std::string& name);
 
-   explicit Agent(const std::string& agentName, boost::container::flat_map<Timestep, AgentMovementInfo> locations, double mortalityRate);
+   explicit Agent(const std::string& agentName,
+      boost::container::flat_map<Timestep, AgentMovementInfo> locations,
+      double infectionSymptomsLambda,
+      double infectionDurationLambda,
+      double mortalityRate);
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
    [[nodiscard]] SIRD get_SIRD_state() const& noexcept { return m_currentState; }
@@ -51,14 +55,17 @@ public:
    [[nodiscard]] std::vector<AgentId> get_nearby_agents_to_infect() const;
 
 private:
-   AgentId m_id;
-   AgentType m_type;
    SIRD m_currentState = SirdState::Susceptible {};
    Building* m_curBuilding;
    Timestep m_nextMovementTime = 0;
    Building::Position m_curPosition;
-   boost::container::flat_map<Timestep, AgentMovementInfo> m_locations;
-   double m_mortalityRate;
+
+   const AgentId m_id;
+   const AgentType m_type;
+   const double m_infectionSymptomsLambda;
+   const double m_infectionDurationLambda;
+   const double m_mortalityRate;
+   const boost::container::flat_map<Timestep, AgentMovementInfo> m_locations;
 
    size_t m_nextRandomMovementIdx;
    size_t m_stride;

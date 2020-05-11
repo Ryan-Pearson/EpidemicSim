@@ -31,11 +31,15 @@ constexpr double MAX_INFECTION_RADIUS = 10.0;
 
 Agent::Agent(const std::string& agentName,
    boost::container::flat_map<Timestep, AgentMovementInfo> locations,
+   const double infectionSymptomsLambda,
+   const double infectionDurationLambda,
    const double mortalityRate) :
    m_id(++uniqueAgentId),
    m_type(get_agent_type_by_name(agentName)),
-   m_locations(std::move(locations)),
-   m_mortalityRate(mortalityRate)
+   m_infectionSymptomsLambda(infectionSymptomsLambda),
+   m_infectionDurationLambda(infectionDurationLambda),
+   m_mortalityRate(mortalityRate),
+   m_locations(std::move(locations))
 {
    std::uniform_int_distribution<> randStart(0, numRandomMovements);
    std::uniform_int_distribution<> randStride(0, std::min(50, static_cast<int>(numRandomMovements / 2)));
@@ -96,8 +100,19 @@ std::optional<Timestep> Agent::attempt_infection(const Timestep curTimeStep)
 {
    if (std::get_if<SirdState::Susceptible>(&m_currentState))
    {
-      m_currentState = SirdState::Infectious {curTimeStep + INFECTION_LENGTH};
-      return INFECTION_LENGTH;
+      std::exponential_distribution infectionSymptomsDist(1.0 / m_infectionSymptomsLambda);
+      std::exponential_distribution infectionDurationDist(1.0 / m_infectionDurationLambda);
+
+      const double symptomsDraw = infectionSymptomsDist(Statistics::get_global_random_engine());
+      const double durationDraw = infectionDurationDist(Statistics::get_global_random_engine());
+
+      const Timestep duration =
+         std::max(2, static_cast<Timestep>(durationDraw * static_cast<double>(TIMESTEP_PER_DAY)));
+      const Timestep symptoms =
+         std::clamp(static_cast<Timestep>(symptomsDraw * static_cast<double>(TIMESTEP_PER_DAY)), 1, duration - 1);
+
+      m_currentState = SirdState::Infectious {curTimeStep + symptoms, curTimeStep + duration};
+      return duration;
    }
    else
    {
