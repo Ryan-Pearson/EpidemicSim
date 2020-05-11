@@ -79,7 +79,7 @@ std::vector<AgentId> Agent::get_nearby_agents_to_infect() const
       const Building::Distance distanceToAgent = curAgentAndDistance.second;
 
       // TODO: Make better
-      static std::normal_distribution infectionDist(0.0, 1.0);
+      static std::normal_distribution infectionDist(0.0, 1.5);
       const double draw = infectionDist(Statistics::get_global_random_engine());
       const bool infectionSuccessful = std::abs(draw) > distanceToAgent;
 

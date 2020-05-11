@@ -1,5 +1,7 @@
 #include "Epidemic/World.h"
 
+#include <iostream>
+
 namespace Epidemic {
 
 struct update_SIR
@@ -68,16 +70,22 @@ std::pair<Timestep, World::SIRD_Levels> World::run_timestep()
       }
    }
 
+   m_curLevels = get_updated_levels(m_agents);
+
    if ((m_curTimestep % TIMESTEP_PER_DAY) == 0)
    {
       const double daysRemaining =
          static_cast<double>(m_numberOfInfectionTimestepsRemaining) / static_cast<double>(TIMESTEP_PER_DAY);
-      m_curRLevel = static_cast<double>(numberInfectedThisDay) * daysRemaining
-         / static_cast<double>(std::max(size_t(1), m_curLevels.m_numInfectious));
+      const double expectedTotalInfectedStart = daysRemaining
+         + static_cast<double>(m_curLevels.m_numInfectious) * static_cast<double>(m_curTimestep / TIMESTEP_PER_DAY);
+      const double expectedTotalInfectedConverged = daysRemaining * 2.0;
+      const double expectedTotalInfectedDays = std::min(expectedTotalInfectedStart, expectedTotalInfectedConverged);
+      const double boundedNumInfected = static_cast<double>(std::max(size_t(1), m_curLevels.m_numInfectious));
+      const double expectedInfectedDaysPerAgent = expectedTotalInfectedDays / boundedNumInfected;
+      const double infectionsPerPerson = static_cast<double>(numberInfectedThisDay) / boundedNumInfected;
+      m_curRLevel = expectedInfectedDaysPerAgent * infectionsPerPerson;
       numberInfectedThisDay = 0;
    }
-
-   m_curLevels = get_updated_levels(m_agents);
 
    return std::make_pair(m_curTimestep, m_curLevels);
 }
