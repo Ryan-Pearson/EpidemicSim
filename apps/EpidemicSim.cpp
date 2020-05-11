@@ -40,7 +40,7 @@ int main()
       std::ofstream buildingLog;
       std::ofstream positionLog;
       std::ofstream sirdLog(OUTPUT_ROOT + "/sirdLog.csv");
-      sirdLog << "Day,Susceptible,Infectious,Recovered,Deceased,Infectious,Susceptible+Infectious,"
+      sirdLog << "Day,R_est,Susceptible,Infectious,Recovered,Deceased,Infectious,Susceptible+Infectious,"
                  "Susceptible+Infectious+Recovered,Susceptible+Infectious+Recovered+Deceased\n";
 
       if (AGENT_TO_LOG_DIAGNOSTICS)
@@ -52,11 +52,11 @@ int main()
          buildingLog << "Timestep,Building,X,Y\n";
       }
 
-      const auto logStats = [&](const int day, const Epidemic::World::SIRD_Levels& stats) {
-         std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}]\n", day, stats.m_numSusceptible,
-            stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased);
-         sirdLog << day << ',' << stats.m_numSusceptible << ',' << stats.m_numInfectious << ',' << stats.m_numRecovered
-                 << ',' << stats.m_numDeceased << ',' << stats.m_numInfectious << ','
+      const auto logStats = [&](const int day, const double curR, const Epidemic::World::SIRD_Levels& stats) {
+         std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}] R[{}]\n", day, stats.m_numSusceptible,
+            stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased, curR);
+         sirdLog << day << ',' << curR << ',' << stats.m_numSusceptible << ',' << stats.m_numInfectious << ','
+                 << stats.m_numRecovered << ',' << stats.m_numDeceased << ',' << stats.m_numInfectious << ','
                  << stats.m_numSusceptible + stats.m_numInfectious << ','
                  << stats.m_numSusceptible + stats.m_numInfectious + stats.m_numRecovered << ','
                  << stats.m_numSusceptible + stats.m_numInfectious + stats.m_numRecovered + stats.m_numDeceased << '\n';
@@ -65,14 +65,14 @@ int main()
       Epidemic::Timestep curTime = 0;
       auto worldStats = world.get_cur_sird_levels();
       int numInfectious = worldStats.m_numInfectious;
-      logStats(curTime / Epidemic::TIMESTEP_PER_DAY, worldStats);
+      logStats(curTime / Epidemic::TIMESTEP_PER_DAY, world.get_cur_R_level(), worldStats);
 
       while (numInfectious > 0)
       {
          std::tie(curTime, worldStats) = world.run_timestep();
          if ((curTime % Epidemic::TIMESTEP_PER_DAY) == 0)
          {
-            logStats(curTime / Epidemic::TIMESTEP_PER_DAY, worldStats);
+            logStats(curTime / Epidemic::TIMESTEP_PER_DAY, world.get_cur_R_level(), worldStats);
          }
          numInfectious = worldStats.m_numInfectious;
 
@@ -92,7 +92,7 @@ int main()
          }
       }
 
-      logStats(curTime / Epidemic::TIMESTEP_PER_DAY, worldStats);
+      logStats(curTime / Epidemic::TIMESTEP_PER_DAY, world.get_cur_R_level(), worldStats);
       std::cout << "Simulation complete" << std::endl;
    }
    catch (...)

@@ -142,12 +142,14 @@ World build_world(const WorldConfiguration& worldConfiguration)
       toInfect.insert(agentPicker(Statistics::get_global_random_engine()));
    }
 
+   Timestep numberOfInfectionTimestepsRemaining = 0;
    for (const AgentId agentToInfect : toInfect)
    {
-      agents[agentToInfect].attempt_infection(0);
+      const auto daysRemaining = agents[agentToInfect].attempt_infection(0);
+      numberOfInfectionTimestepsRemaining += daysRemaining.value_or(0);
    }
 
-   return World(std::move(communities), std::move(agents));
+   return World(std::move(communities), std::move(agents), numberOfInfectionTimestepsRemaining);
 }
 
 } // namespace Epidemic

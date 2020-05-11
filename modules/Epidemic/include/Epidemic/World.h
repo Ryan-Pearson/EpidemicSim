@@ -21,18 +21,23 @@ public:
       size_t m_numDeceased = 0;
    };
 
-   explicit World(std::vector<Community> communities, std::vector<Agent> agents);
+   explicit World(
+      std::vector<Community> communities, std::vector<Agent> agents, Timestep numberOfInfectionTimestepsRemaining);
 
    [[nodiscard]] constexpr Timestep get_cur_timestep() const noexcept { return m_curTimestep; }
    [[nodiscard]] constexpr SIRD_Levels get_cur_sird_levels() && noexcept { return m_curLevels; }
    [[nodiscard]] constexpr const SIRD_Levels& get_cur_sird_levels() const& noexcept { return m_curLevels; }
    [[nodiscard]] constexpr const Agent& get_agent(const AgentId agentId) const& noexcept { return m_agents[agentId]; }
+   [[nodiscard]] constexpr double get_cur_R_level() const noexcept { return m_curRLevel; }
 
    std::pair<Timestep, SIRD_Levels> run_timestep();
 
 private:
    Timestep m_curTimestep = 0;
+   Timestep m_numberOfInfectionTimestepsRemaining;
    SIRD_Levels m_curLevels;
+   int numberInfectedThisDay = 0;
+   double m_curRLevel = 0.0;
    std::vector<Community> m_communities;
    std::vector<Agent> m_agents;
 

@@ -47,7 +47,7 @@ public:
 
    void update_agent_state(Timestep curTimeStep);
    void move_agent(Timestep curTimeStep);
-   void attempt_infection(Timestep curTimeStep);
+   std::optional<Timestep> attempt_infection(Timestep curTimeStep);
    [[nodiscard]] std::vector<AgentId> get_nearby_agents_to_infect() const;
 
 private:

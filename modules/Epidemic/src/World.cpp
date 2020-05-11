@@ -15,7 +15,7 @@ static World::SIRD_Levels get_updated_levels(const std::vector<Agent>& agents)
 {
    World::SIRD_Levels ret;
 
-   auto visitor = update_SIR{ret};
+   auto visitor = update_SIR {ret};
 
    for (const auto& agent : agents)
    {
@@ -25,8 +25,11 @@ static World::SIRD_Levels get_updated_levels(const std::vector<Agent>& agents)
    return ret;
 }
 
-World::World(std::vector<Community> communities, std::vector<Agent> agents) :
-   m_communities(std::move(communities)), m_agents(std::move(agents))
+World::World(
+   std::vector<Community> communities, std::vector<Agent> agents, const Timestep numberOfInfectionTimestepsRemaining) :
+   m_numberOfInfectionTimestepsRemaining(numberOfInfectionTimestepsRemaining),
+   m_communities(std::move(communities)),
+   m_agents(std::move(agents))
 {
    m_curLevels = get_updated_levels(m_agents);
 }
@@ -34,6 +37,7 @@ World::World(std::vector<Community> communities, std::vector<Agent> agents) :
 std::pair<Timestep, World::SIRD_Levels> World::run_timestep()
 {
    ++m_curTimestep;
+   m_numberOfInfectionTimestepsRemaining -= m_curLevels.m_numInfectious;
 
    // Update agent SIRD status and move them
    for (auto& agent : m_agents)
@@ -56,7 +60,18 @@ std::pair<Timestep, World::SIRD_Levels> World::run_timestep()
 
    for (const auto agentToInfect : m_cache_agentsToInfect)
    {
-      m_agents[agentToInfect].attempt_infection(m_curTimestep);
+      const auto numberOfDaysInfected = m_agents[agentToInfect].attempt_infection(m_curTimestep);
+      m_numberOfInfectionTimestepsRemaining += numberOfDaysInfected.value_or(0);
+      ++numberInfectedThisDay;
+   }
+
+   if ((m_curTimestep % TIMESTEP_PER_DAY) == 0)
+   {
+      const double daysRemaining =
+         static_cast<double>(m_numberOfInfectionTimestepsRemaining) / static_cast<double>(TIMESTEP_PER_DAY);
+      m_curRLevel =
+         static_cast<double>(numberInfectedThisDay) / daysRemaining / static_cast<double>(m_curLevels.m_numInfectious);
+      numberInfectedThisDay = 0;
    }
 
    m_curLevels = get_updated_levels(m_agents);

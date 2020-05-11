@@ -74,7 +74,7 @@ std::vector<AgentId> Agent::get_nearby_agents_to_infect() const
       const Building::Distance distanceToAgent = curAgentAndDistance.second;
 
       // TODO: Make better
-      static std::normal_distribution infectionDist(0.0, 2.0);
+      static std::normal_distribution infectionDist(0.0, 1.0);
       const double draw = infectionDist(Statistics::get_global_random_engine());
       const bool infectionSuccessful = std::abs(draw) > distanceToAgent;
 
@@ -87,11 +87,16 @@ std::vector<AgentId> Agent::get_nearby_agents_to_infect() const
    return ret;
 }
 
-void Agent::attempt_infection(const Timestep curTimeStep)
+std::optional<Timestep> Agent::attempt_infection(const Timestep curTimeStep)
 {
    if (std::get_if<SirdState::Susceptible>(&m_currentState))
    {
       m_currentState = SirdState::Infectious {curTimeStep + INFECTION_LENGTH};
+      return INFECTION_LENGTH;
+   }
+   else
+   {
+      return std::nullopt;
    }
 }
 
