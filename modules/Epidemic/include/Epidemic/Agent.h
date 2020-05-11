@@ -7,8 +7,8 @@
 
 // STL
 #include <array>
-#include <string>
 #include <optional>
+#include <string>
 #include <unordered_map>
 
 // Boost
@@ -17,8 +17,8 @@
 
 // Epidemic
 #include "Community.h"
-#include "Types.h"
 #include "SIRDStates.h"
+#include "Types.h"
 
 namespace Epidemic {
 
@@ -39,8 +39,9 @@ public:
    explicit Agent(const std::string& agentName, boost::container::flat_map<Timestep, AgentMovementInfo> locations);
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
-   [[nodiscard]] SIRD get_SIRD_state() const & noexcept { return m_currentState; }
+   [[nodiscard]] SIRD get_SIRD_state() const& noexcept { return m_currentState; }
    [[nodiscard]] const SIRD& get_SIRD_state() && noexcept { return m_currentState; }
+   [[nodiscard]] BuildingId get_current_building_id() const noexcept { return m_curBuilding->get_id(); }
 
    void update_agent_state(Timestep curTimeStep);
    void move_agent(Timestep curTimeStep);
@@ -50,7 +51,7 @@ public:
 private:
    AgentId m_id;
    AgentType m_type;
-   SIRD m_currentState = SirdState::Susceptible{};
+   SIRD m_currentState = SirdState::Susceptible {};
    Building* m_curBuilding;
    Timestep m_nextMovementTime = 0;
    Building::Position m_curPosition;

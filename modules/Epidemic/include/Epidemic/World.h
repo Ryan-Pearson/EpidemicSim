@@ -26,6 +26,7 @@ public:
    [[nodiscard]] constexpr Timestep get_cur_timestep() const noexcept { return m_curTimestep; }
    [[nodiscard]] constexpr SIRD_Levels get_cur_sird_levels() && noexcept { return m_curLevels; }
    [[nodiscard]] constexpr const SIRD_Levels& get_cur_sird_levels() const& noexcept { return m_curLevels; }
+   [[nodiscard]] constexpr const Agent& get_agent(const AgentId agentId) const& noexcept { return m_agents[agentId]; }
 
    std::pair<Timestep, SIRD_Levels> run_timestep();
 

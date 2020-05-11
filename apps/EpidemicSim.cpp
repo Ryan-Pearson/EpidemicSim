@@ -45,7 +45,7 @@ int main()
       while (numInfectious > 0)
       {
          std::tie(curTime, worldStats) = world.run_timestep();
-         if ((curTime % (1440 * 60)) == 0)
+         if ((curTime % Epidemic::TIMESTEP_PER_DAY) == 0)
          {
             logStats(curTime, worldStats);
          }

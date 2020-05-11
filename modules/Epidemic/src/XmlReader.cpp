@@ -128,9 +128,8 @@ static std::pair<Timestep, AgentMovementConfiguration> get_location_info_from_no
       for (size_t i = 0; i < entries.size(); i += 2)
       {
          locations.emplace_back(entries[i]);
-         const int number = boost::lexical_cast<int>(i);
          const int weight = boost::lexical_cast<int>(entries[i + 1]);
-         const auto emplaceRet = numberToWeightMap.emplace(number, weight);
+         const auto emplaceRet = numberToWeightMap.emplace(i / 2, weight);
 
          if (!emplaceRet.second)
          {

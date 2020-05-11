@@ -110,8 +110,9 @@ World build_world(const WorldConfiguration& worldConfiguration)
                         const auto& buildingList =
                            community.get_buildings_of_type(Building::get_building_type_by_name(buildingName));
                         std::uniform_int_distribution<> dis(0, buildingList.size() - 1);
+                        const auto buildingIndex = dis(Statistics::get_global_random_engine());
                         // TODO: Const cast
-                        return const_cast<Building*>(&buildingList[dis(Statistics::get_global_random_engine())]);
+                        return const_cast<Building*>(&buildingList[buildingIndex]);
                      }
                   };
 

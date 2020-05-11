@@ -111,11 +111,10 @@ void Agent::move_agent(const Timestep curTimeStep)
 {
    assert(m_curBuilding != nullptr);
 
-   if (curTimeStep == m_nextMovementTime)
+   const auto timeOfDay = (curTimeStep % TIMESTEP_PER_DAY);
+   if (timeOfDay == m_nextMovementTime)
    {
-      const int curHour =
-         static_cast<int>(static_cast<double>(curTimeStep % TIMESTEP_PER_DAY) * TIMESTEP_TO_TIME_IN_HOUR + 1e-6);
-      const auto locationInfo = m_locations.lower_bound(curHour);
+      const auto locationInfo = m_locations.lower_bound(timeOfDay);
       const auto nextLocationIdx = Statistics::sample_distribution(locationInfo->second.m_locationIdx);
 
       m_curBuilding->agent_leaves_building(m_id);
@@ -132,13 +131,14 @@ void Agent::move_agent(const Timestep curTimeStep)
       else
       {
          const double lambdaTimestep = *locationInfo->second.m_lambda * TIME_IN_HOUR_TO_TIMESTEP;
-         std::exponential_distribution exponentialDistribution(lambdaTimestep);
-         const auto numTimestepsExponential =
-            static_cast<Timestep>(exponentialDistribution(Statistics::get_global_random_engine()));
+         std::exponential_distribution exponentialDistribution(1.0 / lambdaTimestep);
+         const auto exponentialDraw = exponentialDistribution(Statistics::get_global_random_engine());
+         const auto numTimestepsExponential = std::max(1, static_cast<Timestep>(exponentialDraw));
+         const auto nextExponentialTime = timeOfDay + numTimestepsExponential;
          m_nextMovementTime =
-            ((numTimestepsExponential > nextLocationTimeInMap) || (numTimestepsExponential >= TIMESTEP_PER_DAY)) ?
+            ((nextExponentialTime > nextLocationTimeInMap) || (nextExponentialTime >= TIMESTEP_PER_DAY)) ?
             nextLocationTimeInMap :
-            numTimestepsExponential;
+            nextExponentialTime;
       }
    }
    else
