@@ -44,7 +44,8 @@ private:
    BuildingId m_id;
    BuildingType m_type;
    Position m_maxPosition;
-   Position m_entrancePosition;
+   std::uniform_real_distribution<double> m_xDist;
+   std::uniform_real_distribution<double> m_yDist;
    std::unordered_map<AgentId, Position> m_curAgents;
 
    static std::unordered_map<std::string, BuildingType> s_typeByName;

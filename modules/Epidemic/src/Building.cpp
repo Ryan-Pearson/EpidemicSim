@@ -13,7 +13,8 @@ Building::Building(const std::string& buildingName, const Position& maxPosition)
    m_id(++uniqueBuildingId),
    m_type(get_building_type_by_name(buildingName)),
    m_maxPosition(maxPosition),
-   m_entrancePosition(Position {m_maxPosition.m_x / 2.0, 0.0})
+   m_xDist(0.0, m_maxPosition.m_x),
+   m_yDist(0.0, m_maxPosition.m_y)
 {
 }
 
@@ -35,7 +36,9 @@ BuildingType Building::get_building_type_by_name(const std::string& name)
 
 Building::Position Building::agent_enters_building(AgentId agent)
 {
-   const auto empRet = m_curAgents.emplace(agent, m_entrancePosition);
+   const Position randomStart {
+      m_xDist(Statistics::get_global_random_engine()), m_yDist(Statistics::get_global_random_engine())};
+   const auto empRet = m_curAgents.emplace(agent, randomStart);
 
    if (empRet.second)
    {
