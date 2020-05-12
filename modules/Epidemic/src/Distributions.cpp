@@ -30,6 +30,11 @@ namespace Statistics {
    {
       std::vector<int> weights;
 
+      if (numToWeight.empty())
+      {
+         throw std::runtime_error("Cannot create empty pdf!");
+      }
+
       const auto getKey = [](const auto& pair) { return pair.first; };
       const auto getValue = [](const auto& pair) { return pair.second; };
 

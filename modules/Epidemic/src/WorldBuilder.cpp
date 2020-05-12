@@ -146,7 +146,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
    }
 
    int numToInfect = std::min(worldConfiguration.m_initialInfectionSize, static_cast<int>(agents.size()));
-   std::uniform_int_distribution<> agentPicker(0, static_cast<int>(agents.size()));
+   std::uniform_int_distribution<> agentPicker(0, static_cast<int>(agents.size() - 1));
    std::unordered_set<int> toInfect;
    while (static_cast<int>(toInfect.size()) < numToInfect)
    {
