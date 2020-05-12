@@ -32,14 +32,14 @@ constexpr double MAX_INFECTION_RADIUS = 10.0;
 Agent::Agent(Building* spawnLocation,
    const std::string& agentName,
    boost::container::flat_map<Timestep, AgentMovementInfo> locations,
-   const double infectionSymptomsLambda,
-   const double infectionDurationLambda,
+   const Statistics::Distribution infectionSymptomsDist,
+   const Statistics::Distribution infectionDurationDist,
    const double mortalityRate) :
    m_id(++uniqueAgentId),
    m_type(get_agent_type_by_name(agentName)),
    m_spawnLocation(spawnLocation),
-   m_infectionSymptomsLambda(infectionSymptomsLambda),
-   m_infectionDurationLambda(infectionDurationLambda),
+   m_infectionSymptomsDist(infectionSymptomsDist),
+   m_infectionDurationDist(infectionDurationDist),
    m_mortalityRate(mortalityRate),
    m_locations(std::move(locations))
 {
@@ -85,7 +85,7 @@ std::vector<AgentId> Agent::get_nearby_agents_to_infect() const
       const Building::Distance distanceToAgent = curAgentAndDistance.second;
 
       // TODO: Make better
-      static std::normal_distribution infectionDist(0.0, 1.5);
+      static std::normal_distribution infectionDist(0.0, 6.0);
       const double draw = infectionDist(Statistics::get_global_random_engine());
       const bool infectionSuccessful = std::abs(draw) > distanceToAgent;
 
@@ -102,16 +102,11 @@ std::optional<Timestep> Agent::attempt_infection(const Timestep curTimeStep)
 {
    if (std::get_if<SirdState::Susceptible>(&m_currentState))
    {
-      std::exponential_distribution infectionSymptomsDist(1.0 / m_infectionSymptomsLambda);
-      std::exponential_distribution infectionDurationDist(1.0 / m_infectionDurationLambda);
+      const int durationDays = std::max(2, Statistics::sample_distribution(m_infectionDurationDist));
+      const int symptomsDays = std::min(durationDays - 1, Statistics::sample_distribution(m_infectionSymptomsDist));
 
-      const double symptomsDraw = infectionSymptomsDist(Statistics::get_global_random_engine());
-      const double durationDraw = infectionDurationDist(Statistics::get_global_random_engine());
-
-      const Timestep duration =
-         std::max(2, static_cast<Timestep>(durationDraw * static_cast<double>(TIMESTEP_PER_DAY)));
-      const Timestep symptoms =
-         std::clamp(static_cast<Timestep>(symptomsDraw * static_cast<double>(TIMESTEP_PER_DAY)), 1, duration - 1);
+      const Timestep duration = durationDays * TIMESTEP_PER_DAY;
+      const Timestep symptoms = symptomsDays * TIMESTEP_PER_DAY;
 
       m_currentState = SirdState::Infectious {curTimeStep + symptoms, curTimeStep + duration};
       return duration;
@@ -126,10 +121,15 @@ void Agent::update_agent_state(const Timestep curTimeStep)
 {
    if (const auto infectious = std::get_if<SirdState::Infectious>(&m_currentState))
    {
-      if (infectious->m_infectionEndTime < curTimeStep)
+      if (!m_quarantined)
+      {
+         m_quarantined = true;
+      }
+      else if (infectious->m_infectionEndTime < curTimeStep)
       {
          std::uniform_real_distribution<> pkDraw(0.0, 1.0);
          const double draw = pkDraw(Statistics::get_global_random_engine());
+         m_quarantined = false;
 
          if (draw < m_mortalityRate)
          {
@@ -148,18 +148,21 @@ void Agent::move_agent(const Timestep curTimeStep)
    assert(m_curBuilding != nullptr);
 
    const auto timeOfDay = (curTimeStep % TIMESTEP_PER_DAY);
-   if (!m_quarantined)
+
+   if (m_quarantined && m_curBuilding != m_spawnLocation)
    {
       if (const auto infectious = std::get_if<SirdState::Infectious>(&m_currentState))
       {
-         if (infectious->m_symptomsShow <= curTimeStep)
-         {
-            m_quarantined = true;
-            m_curBuilding->agent_leaves_building(m_id);
-            m_curBuilding = m_spawnLocation;
-            m_curPosition = m_curBuilding->agent_enters_building(m_id);
-            m_nextMovementTime = std::numeric_limits<Timestep>::max();
-         }
+         m_curBuilding->agent_leaves_building(m_id);
+         m_curBuilding = m_spawnLocation;
+         m_curPosition = m_curBuilding->agent_enters_building(m_id);
+         const auto endInfectionTod = (infectious->m_infectionEndTime % TIMESTEP_PER_DAY);
+         const auto nextLocation = m_locations.lower_bound(endInfectionTod);
+         m_nextMovementTime = (nextLocation == m_locations.cend()) ? 0 : nextLocation->first;
+      }
+      else
+      {
+         throw std::runtime_error("Quarantined but not infectious, how did we get here?");
       }
    }
    else if (timeOfDay == m_nextMovementTime)

@@ -130,7 +130,7 @@ World build_world(const WorldConfiguration& worldConfiguration)
                movementConfigMapToInfoMap);
 
             agents.emplace_back(Agent(buildingSpawnInfo.m_building, agentConfig.m_name, std::move(locations),
-               worldConfiguration.m_infectionSymptomsLambda, worldConfiguration.m_infectionDurationLambda,
+               worldConfiguration.m_infectionSymptomsDist, worldConfiguration.m_infectionDurationDist,
                agentConfig.m_mortalityRate));
          }
       }

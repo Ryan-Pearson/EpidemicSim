@@ -38,7 +38,7 @@ namespace Statistics {
       int m_value;
    };
 
-   using Distribution = std::variant<PDF, Gaussian, Fixed>;
+   using Distribution = std::variant<Fixed, PDF, Gaussian>;
 
    int sample_distribution(const Distribution& dist) noexcept;
 

@@ -233,8 +233,14 @@
 
 	<WorldConfiguration>
 		<InitialInfectionSize> 20 </InitialInfectionSize>
-		<InfectionSymptomsLambda> 7.0 </InfectionSymptomsLambda>
-		<InfectionDurationLambda> 14.0 </InfectionDurationLambda>
+		<InfectionSymptomsShow>
+			<Mean> 7.0 </Mean>>
+			<StdDev> 1.0 </StdDev>
+		</InfectionSymptomsShow>
+		<InfectionDuration>
+			<Mean> 14.0 </Mean>>
+			<StdDev> 2.0 </StdDev>
+		</InfectionDuration>
 		<Community name="Large">
 			<Fixed> 1 </Fixed>
 		</Community>

@@ -46,8 +46,8 @@ struct WorldConfiguration
    std::unordered_map<CommunityType, CommunityConfiguration> m_communityConfigs;
 
    int m_initialInfectionSize = 0;
-   double m_infectionSymptomsLambda;
-   double m_infectionDurationLambda;
+   Statistics::Distribution m_infectionSymptomsDist;
+   Statistics::Distribution m_infectionDurationDist;
    std::unordered_map<CommunityType, Statistics::Distribution> m_communities;
 };
 

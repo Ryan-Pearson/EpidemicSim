@@ -355,28 +355,24 @@ WorldConfiguration get_world_config_from_xml(const std::string& fullFilePath)
       throw std::runtime_error("Could not find XML Element InitialInfectionSize");
    }
 
-   const auto infectionSymptomsLambda = worldConfigNode.child("InfectionSymptomsLambda");
+   const auto infectionSymptomsLambda = worldConfigNode.child("InfectionSymptomsShow");
    if (infectionSymptomsLambda)
    {
-      std::string infectionSymptomsText = infectionSymptomsLambda.child_value();
-      boost::algorithm::trim(infectionSymptomsText);
-      ret.m_infectionSymptomsLambda = boost::lexical_cast<double>(infectionSymptomsText);
+      ret.m_infectionSymptomsDist = read_distribution_from_node(infectionSymptomsLambda);
    }
    else
    {
-      throw std::runtime_error("Could not find XML Element InfectionSymptomsLambda");
+      throw std::runtime_error("Could not find XML Element InfectionSymptomsShow");
    }
 
-   const auto infectionDurationLambda = worldConfigNode.child("InfectionDurationLambda");
+   const auto infectionDurationLambda = worldConfigNode.child("InfectionDuration");
    if (infectionDurationLambda)
    {
-      std::string infectionDurationText = infectionDurationLambda.child_value();
-      boost::algorithm::trim(infectionDurationText);
-      ret.m_infectionDurationLambda = boost::lexical_cast<double>(infectionDurationText);
+      ret.m_infectionDurationDist = read_distribution_from_node(infectionDurationLambda);
    }
    else
    {
-      throw std::runtime_error("Could not find XML Element InfectionDurationLambda");
+      throw std::runtime_error("Could not find XML Element InfectionDuration");
    }
 
    return ret;

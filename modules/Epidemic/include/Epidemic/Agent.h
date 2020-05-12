@@ -39,8 +39,8 @@ public:
    explicit Agent(Building* spawnLocation,
       const std::string& agentName,
       boost::container::flat_map<Timestep, AgentMovementInfo> locations,
-      double infectionSymptomsLambda,
-      double infectionDurationLambda,
+      Statistics::Distribution infectionSymptomsDist,
+      Statistics::Distribution infectionDurationDist,
       double mortalityRate);
 
    [[nodiscard]] constexpr AgentId get_id() const noexcept { return m_id; }
@@ -65,8 +65,8 @@ private:
    const AgentId m_id;
    const AgentType m_type;
    Building* m_spawnLocation;
-   const double m_infectionSymptomsLambda;
-   const double m_infectionDurationLambda;
+   const Statistics::Distribution m_infectionSymptomsDist;
+   const Statistics::Distribution m_infectionDurationDist;
    const double m_mortalityRate;
    const boost::container::flat_map<Timestep, AgentMovementInfo> m_locations;
 
