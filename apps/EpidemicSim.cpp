@@ -18,6 +18,9 @@ static const std::string SOURCE_DIR = BASE_DIR;
 static const std::string OUTPUT_ROOT = BASE_DIR + std::string("/output");
 constexpr std::optional<Epidemic::AgentId> AGENT_TO_LOG_DIAGNOSTICS = std::nullopt;
 
+std::mutex cumulativeStatsMut;
+std::mutex coutMut;
+
 void handle_eptr(std::exception_ptr eptr)
 {
    try
@@ -55,6 +58,7 @@ static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
    }
 
    const auto logStats = [&](const int day, const double curR, const Epidemic::World::SIRD_Levels& stats) {
+      std::lock_guard<std::mutex> lock(coutMut);
       std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}] R[{}]\n", day, stats.m_numSusceptible,
          stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased, curR);
       sirdLog << day << ',' << curR << ',' << stats.m_numSusceptible << ',' << stats.m_numInfectious << ','
@@ -129,7 +133,6 @@ int main()
 
       std::vector<MonteCarloSirdInfo> sirdByDay;
       sirdByDay.reserve(100);
-      std::mutex cumulativeStatsMut;
 
       const auto logCumulativeStats = [&](const int day, const Epidemic::World::SIRD_Levels& stats) {
          std::lock_guard<std::mutex> lock(cumulativeStatsMut);

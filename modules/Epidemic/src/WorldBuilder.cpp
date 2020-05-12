@@ -9,8 +9,12 @@
 
 namespace Epidemic {
 
+std::mutex worldBuildingMutex;
+
 World build_world(const WorldConfiguration& worldConfiguration)
 {
+   std::lock_guard<std::mutex> lock(worldBuildingMutex);
+
    struct BuildingSpawnInfo
    {
       CommunityId m_community;
