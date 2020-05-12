@@ -232,7 +232,8 @@
 	</Communities>
 
 	<WorldConfiguration>
-		<NumMonteCarloRuns> 5 </NumMonteCarloRuns>
+		<NumThreads> 16 </NumThreads>
+		<NumMonteCarloRuns> 100 </NumMonteCarloRuns>
 		<InitialInfectionSize> 20 </InitialInfectionSize>
 		<InfectionSymptomsShow>
 			<Gaussian>

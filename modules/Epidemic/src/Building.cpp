@@ -5,9 +5,9 @@
 
 namespace Epidemic {
 
-static BuildingId uniqueBuildingId = -1;
-static BuildingType uniqueBuildingType = -1;
-std::unordered_map<std::string, BuildingType> Building::s_typeByName;
+thread_local BuildingId uniqueBuildingId = -1;
+thread_local BuildingType uniqueBuildingType = -1;
+thread_local std::unordered_map<std::string, BuildingType> Building::s_typeByName;
 
 Building::Building(const std::string& buildingName, const Position& maxPosition) :
    m_id(++uniqueBuildingId),

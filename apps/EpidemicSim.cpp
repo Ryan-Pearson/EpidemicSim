@@ -1,6 +1,11 @@
 // STL
 #include <fstream>
 #include <iostream>
+#include <thread>
+
+// Boost
+#include <boost/asio/post.hpp>
+#include <boost/asio/thread_pool.hpp>
 
 // FMT
 #include <fmt/format.h>
@@ -28,6 +33,77 @@ void handle_eptr(std::exception_ptr eptr)
    }
 }
 
+static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
+   const std::function<void(int, const Epidemic::World::SIRD_Levels&)>& cumulativeLog,
+   const int repNumber)
+{
+   auto world = Epidemic::build_world(worldConfiguration);
+
+   std::ofstream buildingLog;
+   std::ofstream positionLog;
+   std::ofstream sirdLog(OUTPUT_ROOT + fmt::format("/sirdLog_{}.csv", repNumber));
+   sirdLog << "Day,R_est,Susceptible,Infectious,Recovered,Deceased,Infectious,Susceptible+Infectious,"
+              "Susceptible+Infectious+Recovered,Susceptible+Infectious+Recovered+Deceased\n";
+
+   if (AGENT_TO_LOG_DIAGNOSTICS)
+   {
+      buildingLog = std::ofstream(OUTPUT_ROOT + fmt::format("/buildingLog_{}.csv", repNumber));
+      buildingLog << "Day,Hour,Building\n";
+
+      positionLog = std::ofstream(OUTPUT_ROOT + fmt::format("/positionLog_{}.csv", repNumber));
+      buildingLog << "Timestep,Building,X,Y\n";
+   }
+
+   const auto logStats = [&](const int day, const double curR, const Epidemic::World::SIRD_Levels& stats) {
+      std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}] R[{}]\n", day, stats.m_numSusceptible,
+         stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased, curR);
+      sirdLog << day << ',' << curR << ',' << stats.m_numSusceptible << ',' << stats.m_numInfectious << ','
+              << stats.m_numRecovered << ',' << stats.m_numDeceased << ',' << stats.m_numInfectious << ','
+              << stats.m_numSusceptible + stats.m_numInfectious << ','
+              << stats.m_numSusceptible + stats.m_numInfectious + stats.m_numRecovered << ','
+              << stats.m_numSusceptible + stats.m_numInfectious + stats.m_numRecovered + stats.m_numDeceased << '\n';
+   };
+
+   Epidemic::Timestep curTime = 0;
+   auto worldStats = world.get_cur_sird_levels();
+   int numInfectious = worldStats.m_numInfectious;
+
+   const int dayBegin = curTime / Epidemic::TIMESTEP_PER_DAY;
+   logStats(dayBegin, world.get_cur_R_level(), worldStats);
+   cumulativeLog(dayBegin, worldStats);
+
+   while (numInfectious > 0)
+   {
+      std::tie(curTime, worldStats) = world.run_timestep();
+      if ((curTime % Epidemic::TIMESTEP_PER_DAY) == 0)
+      {
+         const int curDay = curTime / Epidemic::TIMESTEP_PER_DAY;
+         logStats(curDay, world.get_cur_R_level(), worldStats);
+         cumulativeLog(curDay, worldStats);
+      }
+      numInfectious = worldStats.m_numInfectious;
+
+      if (AGENT_TO_LOG_DIAGNOSTICS)
+      {
+         const auto& agent = world.get_agent(AGENT_TO_LOG_DIAGNOSTICS.value());
+         const auto buildingId = agent.get_current_building_id();
+         const auto position = agent.get_current_position();
+         positionLog << curTime << ',' << buildingId << ',' << position.m_x << ',' << position.m_y << '\n';
+
+         if ((curTime % Epidemic::TIMESTEP_PER_HOUR) == 0)
+         {
+            const auto day = curTime / Epidemic::TIMESTEP_PER_DAY;
+            const auto hour = (curTime / Epidemic::TIMESTEP_PER_HOUR) % 24;
+            buildingLog << day << ',' << hour << ',' << buildingId << '\n';
+         }
+      }
+   }
+
+   const int dayEnd = curTime / Epidemic::TIMESTEP_PER_DAY;
+   logStats(dayEnd, world.get_cur_R_level(), worldStats);
+   cumulativeLog(dayEnd, worldStats);
+}
+
 int main()
 {
    std::exception_ptr eptr;
@@ -53,104 +129,55 @@ int main()
 
       std::vector<MonteCarloSirdInfo> sirdByDay;
       sirdByDay.reserve(100);
+      std::mutex cumulativeStatsMut;
 
+      const auto logCumulativeStats = [&](const int day, const Epidemic::World::SIRD_Levels& stats) {
+         std::lock_guard<std::mutex> lock(cumulativeStatsMut);
+
+         if (day >= sirdByDay.size())
+         {
+            sirdByDay.emplace_back();
+         }
+
+         auto& curDay = sirdByDay[day];
+
+         curDay.s.e_x =
+            (curDay.s.e_x * curDay.s.numAdded + static_cast<double>(stats.m_numSusceptible)) / (curDay.s.numAdded + 1);
+         curDay.s.e_x_sq =
+            (curDay.s.e_x_sq * curDay.s.numAdded + static_cast<double>(stats.m_numSusceptible * stats.m_numSusceptible))
+            / (curDay.s.numAdded + 1);
+         ++curDay.s.numAdded;
+
+         curDay.i.e_x =
+            (curDay.i.e_x * curDay.i.numAdded + static_cast<double>(stats.m_numInfectious)) / (curDay.i.numAdded + 1);
+         curDay.i.e_x_sq =
+            (curDay.i.e_x_sq * curDay.i.numAdded + static_cast<double>(stats.m_numInfectious * stats.m_numInfectious))
+            / (curDay.i.numAdded + 1);
+         ++curDay.i.numAdded;
+
+         curDay.r.e_x =
+            (curDay.r.e_x * curDay.r.numAdded + static_cast<double>(stats.m_numRecovered)) / (curDay.r.numAdded + 1);
+         curDay.r.e_x_sq =
+            (curDay.r.e_x_sq * curDay.r.numAdded + static_cast<double>(stats.m_numRecovered * stats.m_numRecovered))
+            / (curDay.r.numAdded + 1);
+         ++curDay.r.numAdded;
+
+         curDay.d.e_x =
+            (curDay.d.e_x * curDay.d.numAdded + static_cast<double>(stats.m_numDeceased)) / (curDay.d.numAdded + 1);
+         curDay.d.e_x_sq =
+            (curDay.d.e_x_sq * curDay.d.numAdded + static_cast<double>(stats.m_numDeceased * stats.m_numDeceased))
+            / (curDay.d.numAdded + 1);
+         ++curDay.d.numAdded;
+      };
+
+      const int numThreadsToUse =
+         std::min(worldConfiguration.m_numThreads, static_cast<int>(std::thread::hardware_concurrency()));
+      boost::asio::thread_pool pool(numThreadsToUse);
       for (int i = 0; i < worldConfiguration.m_numMonteCarloRuns; ++i)
       {
-         auto world = Epidemic::build_world(worldConfiguration);
-
-         std::ofstream buildingLog;
-         std::ofstream positionLog;
-         std::ofstream sirdLog(OUTPUT_ROOT + fmt::format("/sirdLog_{}.csv", i));
-         sirdLog << "Day,R_est,Susceptible,Infectious,Recovered,Deceased,Infectious,Susceptible+Infectious,"
-                    "Susceptible+Infectious+Recovered,Susceptible+Infectious+Recovered+Deceased\n";
-
-         if (AGENT_TO_LOG_DIAGNOSTICS)
-         {
-            buildingLog = std::ofstream(OUTPUT_ROOT + fmt::format("/buildingLog_{}.csv", i));
-            buildingLog << "Day,Hour,Building\n";
-
-            positionLog = std::ofstream(OUTPUT_ROOT + fmt::format("/positionLog_{}.csv", i));
-            buildingLog << "Timestep,Building,X,Y\n";
-         }
-
-         const auto logStats = [&](const int day, const double curR, const Epidemic::World::SIRD_Levels& stats) {
-            if (day >= sirdByDay.size())
-            {
-               sirdByDay.emplace_back();
-            }
-
-            auto& curDay = sirdByDay[day];
-
-            curDay.s.e_x = (curDay.s.e_x * curDay.s.numAdded + static_cast<double>(stats.m_numSusceptible))
-               / (curDay.s.numAdded + 1);
-            curDay.s.e_x_sq = (curDay.s.e_x_sq * curDay.s.numAdded
-                                 + static_cast<double>(stats.m_numSusceptible * stats.m_numSusceptible))
-               / (curDay.s.numAdded + 1);
-            ++curDay.s.numAdded;
-
-            curDay.i.e_x = (curDay.i.e_x * curDay.i.numAdded + static_cast<double>(stats.m_numInfectious))
-               / (curDay.i.numAdded + 1);
-            curDay.i.e_x_sq = (curDay.i.e_x_sq * curDay.i.numAdded
-                                 + static_cast<double>(stats.m_numInfectious * stats.m_numInfectious))
-               / (curDay.i.numAdded + 1);
-            ++curDay.i.numAdded;
-
-            curDay.r.e_x =
-               (curDay.r.e_x * curDay.r.numAdded + static_cast<double>(stats.m_numRecovered)) / (curDay.r.numAdded + 1);
-            curDay.r.e_x_sq =
-               (curDay.r.e_x_sq * curDay.r.numAdded + static_cast<double>(stats.m_numRecovered * stats.m_numRecovered))
-               / (curDay.r.numAdded + 1);
-            ++curDay.r.numAdded;
-
-            curDay.d.e_x =
-               (curDay.d.e_x * curDay.d.numAdded + static_cast<double>(stats.m_numDeceased)) / (curDay.d.numAdded + 1);
-            curDay.d.e_x_sq =
-               (curDay.d.e_x_sq * curDay.d.numAdded + static_cast<double>(stats.m_numDeceased * stats.m_numDeceased))
-               / (curDay.d.numAdded + 1);
-            ++curDay.d.numAdded;
-
-            std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}] R[{}]\n", day, stats.m_numSusceptible,
-               stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased, curR);
-            sirdLog << day << ',' << curR << ',' << stats.m_numSusceptible << ',' << stats.m_numInfectious << ','
-                    << stats.m_numRecovered << ',' << stats.m_numDeceased << ',' << stats.m_numInfectious << ','
-                    << stats.m_numSusceptible + stats.m_numInfectious << ','
-                    << stats.m_numSusceptible + stats.m_numInfectious + stats.m_numRecovered << ','
-                    << stats.m_numSusceptible + stats.m_numInfectious + stats.m_numRecovered + stats.m_numDeceased
-                    << '\n';
-         };
-
-         Epidemic::Timestep curTime = 0;
-         auto worldStats = world.get_cur_sird_levels();
-         int numInfectious = worldStats.m_numInfectious;
-         logStats(curTime / Epidemic::TIMESTEP_PER_DAY, world.get_cur_R_level(), worldStats);
-
-         while (numInfectious > 0)
-         {
-            std::tie(curTime, worldStats) = world.run_timestep();
-            if ((curTime % Epidemic::TIMESTEP_PER_DAY) == 0)
-            {
-               logStats(curTime / Epidemic::TIMESTEP_PER_DAY, world.get_cur_R_level(), worldStats);
-            }
-            numInfectious = worldStats.m_numInfectious;
-
-            if (AGENT_TO_LOG_DIAGNOSTICS)
-            {
-               const auto& agent = world.get_agent(AGENT_TO_LOG_DIAGNOSTICS.value());
-               const auto buildingId = agent.get_current_building_id();
-               const auto position = agent.get_current_position();
-               positionLog << curTime << ',' << buildingId << ',' << position.m_x << ',' << position.m_y << '\n';
-
-               if ((curTime % Epidemic::TIMESTEP_PER_HOUR) == 0)
-               {
-                  const auto day = curTime / Epidemic::TIMESTEP_PER_DAY;
-                  const auto hour = (curTime / Epidemic::TIMESTEP_PER_HOUR) % 24;
-                  buildingLog << day << ',' << hour << ',' << buildingId << '\n';
-               }
-            }
-         }
-
-         logStats(curTime / Epidemic::TIMESTEP_PER_DAY, world.get_cur_R_level(), worldStats);
+         boost::asio::post(pool, [&]() { perform_run(worldConfiguration, logCumulativeStats, i); });
       }
+      pool.join();
 
       std::ofstream sirdLog(OUTPUT_ROOT + fmt::format("/sirdLog_overall.csv"));
       sirdLog << "Day,Susceptible_Mean,Susceptible_Std,Infectious_Mean,Infectious_Std,Recovered_Mean,Recovered_Std,"
@@ -194,9 +221,9 @@ int main()
          const double d_l = d_e - d_s;
          const double d_h = d_e + d_s;
 
-         sirdLog << i << e_s << ',' << std_s << ',' << e_i << ',' << std_i << ',' << e_r << ',' << std_r << ',' << e_d
-                 << ',' << std_d << ',' << a_e << ',' << a_l << ',' << a_h << ',' << b_e << ',' << b_l << ',' << b_h
-                 << ',' << c_e << ',' << c_l << ',' << c_h << ',' << d_e << ',' << d_l << ',' << d_h << '\n';
+         sirdLog << i << ',' << e_s << ',' << std_s << ',' << e_i << ',' << std_i << ',' << e_r << ',' << std_r << ','
+                 << e_d << ',' << std_d << ',' << a_e << ',' << a_l << ',' << a_h << ',' << b_e << ',' << b_l << ','
+                 << b_h << ',' << c_e << ',' << c_l << ',' << c_h << ',' << d_e << ',' << d_l << ',' << d_h << '\n';
       }
 
       std::cout << "Simulation complete" << std::endl;

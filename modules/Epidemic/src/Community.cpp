@@ -2,9 +2,9 @@
 
 namespace Epidemic {
 
-static CommunityId uniqueCommunityId = -1;
-static CommunityType uniqueCommunityType = -1;
-std::unordered_map<std::string, CommunityType> Community::s_typeByName;
+thread_local CommunityId uniqueCommunityId = -1;
+thread_local CommunityType uniqueCommunityType = -1;
+thread_local std::unordered_map<std::string, CommunityType> Community::s_typeByName;
 
 Community::Community(BuildingByTypeMap buildings) : m_id(++uniqueCommunityId), m_buildings(std::move(buildings))
 {

@@ -20,14 +20,14 @@ static std::vector<std::pair<double, double>> generate_random_movement_vector(co
    return ret;
 }
 
-static AgentId uniqueAgentId = -1;
-static AgentType uniqueAgentType = -1;
+thread_local AgentId uniqueAgentId = -1;
+thread_local AgentType uniqueAgentType = -1;
 constexpr size_t numRandomMovements = 100000;
-static const std::vector<std::pair<double, double>> randomMovementVector =
+thread_local const std::vector<std::pair<double, double>> randomMovementVector =
    generate_random_movement_vector(numRandomMovements);
-std::unordered_map<std::string, AgentType> Agent::s_typeByName;
+thread_local std::unordered_map<std::string, AgentType> Agent::s_typeByName;
 
-constexpr double MAX_INFECTION_RADIUS = 10.0;
+constexpr double MAX_INFECTION_RADIUS = 20.0;
 
 Agent::Agent(Building* spawnLocation,
    const std::string& agentName,
@@ -91,7 +91,7 @@ std::vector<AgentId> Agent::get_nearby_agents_to_infect() const
       const Building::Distance distanceToAgent = curAgentAndDistance.second;
 
       // TODO: Make better
-      static std::normal_distribution infectionDist(0.0, 6.0);
+      thread_local std::normal_distribution infectionDist(0.0, 6.0);
       const double draw = infectionDist(Statistics::get_global_random_engine());
       const bool infectionSuccessful = std::abs(draw) > distanceToAgent;
 

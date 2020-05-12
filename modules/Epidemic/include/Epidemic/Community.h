@@ -38,7 +38,7 @@ private:
    CommunityId m_id;
    BuildingByTypeMap m_buildings;
 
-   static std::unordered_map<std::string, CommunityType> s_typeByName;
+   static thread_local std::unordered_map<std::string, CommunityType> s_typeByName;
 };
 
 } // namespace Epidemic

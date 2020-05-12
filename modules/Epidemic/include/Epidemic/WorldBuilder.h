@@ -45,6 +45,7 @@ struct WorldConfiguration
    std::unordered_map<BuildingType, BuildingConfiguration> m_buildingConfigs;
    std::unordered_map<CommunityType, CommunityConfiguration> m_communityConfigs;
 
+   int m_numThreads = 0;
    int m_numMonteCarloRuns = 0;
    int m_initialInfectionSize = 0;
    Statistics::Distribution m_infectionSymptomsDist;

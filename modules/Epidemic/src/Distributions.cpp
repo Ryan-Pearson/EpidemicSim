@@ -22,7 +22,7 @@ namespace Statistics {
 
    std::mt19937& get_global_random_engine()
    {
-      static std::mt19937 engine = seeded_random_engine();
+      thread_local std::mt19937 engine = seeded_random_engine();
       return engine;
    }
 

@@ -343,6 +343,18 @@ WorldConfiguration get_world_config_from_xml(const std::string& fullFilePath)
       throw std::runtime_error(fmt::format("Could not find XML Element ", WORLD_ROOT));
    }
 
+   const auto threadsNode = worldConfigNode.child("NumThreads");
+   if (threadsNode)
+   {
+      std::string threadText = threadsNode.child_value();
+      boost::algorithm::trim(threadText);
+      ret.m_numThreads = boost::lexical_cast<int>(threadText);
+   }
+   else
+   {
+      throw std::runtime_error("Could not find XML Element NumThreads");
+   }
+
    const auto monteCarloNode = worldConfigNode.child("NumMonteCarloRuns");
    if (monteCarloNode)
    {

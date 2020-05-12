@@ -74,7 +74,7 @@ private:
    size_t m_nextRandomMovementIdx;
    size_t m_stride;
 
-   static std::unordered_map<std::string, AgentType> s_typeByName;
+   static thread_local std::unordered_map<std::string, AgentType> s_typeByName;
 };
 
 } // namespace Epidemic

@@ -49,7 +49,7 @@ private:
    std::uniform_real_distribution<double> m_yDist;
    std::unordered_map<AgentId, Position> m_curAgents;
 
-   static std::unordered_map<std::string, BuildingType> s_typeByName;
+   static thread_local std::unordered_map<std::string, BuildingType> s_typeByName;
 };
 
 } // namespace Epidemic
