@@ -24,11 +24,11 @@ public:
    explicit World(
       std::vector<Community> communities, std::vector<Agent> agents, Timestep numberOfInfectionTimestepsRemaining);
 
-   [[nodiscard]] constexpr Timestep get_cur_timestep() const noexcept { return m_curTimestep; }
-   [[nodiscard]] constexpr SIRD_Levels get_cur_sird_levels() && noexcept { return m_curLevels; }
-   [[nodiscard]] constexpr const SIRD_Levels& get_cur_sird_levels() const& noexcept { return m_curLevels; }
-   [[nodiscard]] constexpr const Agent& get_agent(const AgentId agentId) const& noexcept { return m_agents[agentId]; }
-   [[nodiscard]] constexpr double get_cur_R_level() const noexcept { return m_curRLevel; }
+   [[nodiscard]] Timestep get_cur_timestep() const noexcept { return m_curTimestep; }
+   [[nodiscard]] SIRD_Levels get_cur_sird_levels() && noexcept { return m_curLevels; }
+   [[nodiscard]] const SIRD_Levels& get_cur_sird_levels() const& noexcept { return m_curLevels; }
+   [[nodiscard]] const Agent& get_agent(const AgentId agentId) const& noexcept { return m_agents[static_cast<size_t>(agentId)]; }
+   [[nodiscard]] double get_cur_R_level() const noexcept { return m_curRLevel; }
 
    std::pair<Timestep, SIRD_Levels> run_timestep();
 

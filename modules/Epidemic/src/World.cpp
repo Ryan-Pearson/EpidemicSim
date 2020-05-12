@@ -1,6 +1,7 @@
 #include "Epidemic/World.h"
 
-#include <iostream>
+// STL
+#include <algorithm>
 
 namespace Epidemic {
 

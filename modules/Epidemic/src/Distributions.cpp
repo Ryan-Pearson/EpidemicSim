@@ -4,6 +4,9 @@
 
 #include "Epidemic/Distributions.h"
 
+// STL
+#include <algorithm>
+
 namespace Epidemic {
 namespace Statistics {
 

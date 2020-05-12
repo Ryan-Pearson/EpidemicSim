@@ -43,17 +43,34 @@ target_include_directories(Epidemic
 # Create an export header so that we can export our interface when creating a shared library
 generate_export_header(Epidemic EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/epidemic_export.h)
 
-#find_package(Boost ${MODULES_BOOST_VERSION} REQUIRED QUIET)
+if (NOT USE_CONAN)
+    find_package(Boost ${MODULES_BOOST_VERSION} REQUIRED QUIET)
+    find_package(fmt REQUIRED)
+    find_package(pugixml REQUIRED)
+endif()
 
 # Stating dependancies
 target_link_libraries(Epidemic
-      PUBLIC
-      modules_public_config
-      ${CONAN_LIBS}
+    PUBLIC
+        modules_public_config
 
-      PRIVATE
-      modules_private_config
-      )
+    PRIVATE
+        modules_private_config
+)
+
+if(USE_CONAN)
+    target_link_libraries(Epidemic
+    PUBLIC
+        ${CONAN_LIBS}
+    )
+else()
+    target_link_libraries(Epidemic
+        PUBLIC
+            Boost::boost
+            fmt
+            pugixml
+    )
+endif()
 
 # Need to include the export directory for "epidemic_export.h"
 target_include_directories(Epidemic

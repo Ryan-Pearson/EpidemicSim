@@ -1,5 +1,8 @@
 #include "Epidemic/Agent.h"
 
+// STL
+#include <algorithm>
+
 namespace Epidemic {
 
 static std::vector<std::pair<double, double>> generate_random_movement_vector(const size_t toGenerate)

@@ -64,8 +64,11 @@ endif(BUILD_UNIT_TESTS)
 ################################
 # Conan dependency setup
 ################################
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+option(USE_CONAN "Whether to build with conan for dependencies." OFF)
+if (USE_CONAN)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup()
+endif()
 
 ################################
 # Adding modules

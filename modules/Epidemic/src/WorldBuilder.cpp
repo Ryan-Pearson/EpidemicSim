@@ -5,6 +5,8 @@
 #include "Epidemic/WorldBuilder.h"
 
 // STL
+#include <algorithm>
+#include <mutex>
 #include <unordered_set>
 
 namespace Epidemic {
@@ -58,8 +60,8 @@ World build_world(const WorldConfiguration& worldConfiguration)
 
             auto& containerOfBuildingsOfThisType = buildingsEmplaceRet.first->second;
 
-            std::uniform_int_distribution xDist(buildingConfig.m_minX, buildingConfig.m_maxX);
-            std::uniform_int_distribution yDist(buildingConfig.m_minX, buildingConfig.m_maxY);
+            std::uniform_real_distribution<> xDist(buildingConfig.m_minX, buildingConfig.m_maxX);
+            std::uniform_real_distribution<> yDist(buildingConfig.m_minX, buildingConfig.m_maxY);
 
             const int numBuildingsToSpawn = std::max(0, Statistics::sample_distribution(buildingDistribution));
 
@@ -91,8 +93,8 @@ World build_world(const WorldConfiguration& worldConfiguration)
    for (const auto& buildingSpawnInfo : agentsInBuildingToSpawn)
    {
       const auto& maxPosition = buildingSpawnInfo.m_building->get_max_position();
-      std::uniform_int_distribution curBuildingXDist(0.0, maxPosition.m_x);
-      std::uniform_int_distribution curBuildingYDist(0.0, maxPosition.m_y);
+      std::uniform_real_distribution<> curBuildingXDist(0.0, maxPosition.m_x);
+      std::uniform_real_distribution<> curBuildingYDist(0.0, maxPosition.m_y);
 
       const auto& community = communities[buildingSpawnInfo.m_community];
 
