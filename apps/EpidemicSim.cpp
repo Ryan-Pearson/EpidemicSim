@@ -121,13 +121,23 @@ static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
    }
 }
 
-int main()
+int main(int argc, char** argv)
 {
+   if (argc != 2)
+   {
+      std::cerr << "Error: Expecting to be run with a filename of input to be used. For example: ./Epidemic "
+                   "../inputs/baseline.xml"
+                << std::endl;
+      return EXIT_FAILURE;
+   }
+
    std::exception_ptr eptr;
    try
    {
-      const std::string fullFilePath = SOURCE_DIR + "/test_input_small.xml";
+      const std::string fullFilePath = argv[1];
+      std::cout << "Attempting to parse input file: " << fullFilePath << " ...";
       const auto worldConfiguration = Epidemic::get_world_config_from_xml(fullFilePath);
+      std::cout << "complete\n";
 
       struct CumulativeInfo
       {
@@ -186,10 +196,16 @@ int main()
          ++curDay.d.numAdded;
       };
 
-      const int numThreadsToUse =
-         std::min(worldConfiguration.m_numThreads, static_cast<int>(std::thread::hardware_concurrency()));
+      const int threadsSupported = static_cast<int>(std::thread::hardware_concurrency());
+
+      std::cout << "Detected:\n[Threads Requested - " << worldConfiguration.m_numThreads
+                << "]\n[Threads Hardware Supports - " << threadsSupported << "]\n[Monte Carlo Runs Requested - "
+                << worldConfiguration.m_numMonteCarloRuns << "]\n";
+
+      const int numThreadsToUse = std::min(worldConfiguration.m_numThreads, threadsSupported);
       boost::asio::thread_pool pool(numThreadsToUse);
       numTotal = worldConfiguration.m_numMonteCarloRuns;
+      std::cout << "Starting " << numTotal << " monte carlo runs with " << numThreadsToUse << " threads\n";
       for (int i = 0; i < numTotal; ++i)
       {
          boost::asio::post(pool, [=]() { perform_run(worldConfiguration, logCumulativeStats, i); });

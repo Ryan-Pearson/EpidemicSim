@@ -43,6 +43,7 @@
 						NonEssential 10
 						NonEssential 10
 						NonEssential 10
+						NonEssential 10
 						SpawnLocation 35
 					</PDF>
 					<Fixed start="21">
@@ -232,22 +233,22 @@
 	</Communities>
 
 	<WorldConfiguration>
+		<NumThreads> 6 </NumThreads>
+		<NumMonteCarloRuns> 6 </NumMonteCarloRuns>
 		<InitialInfectionSize> 20 </InitialInfectionSize>
 		<InfectionSymptomsShow>
-			<Mean> 7.0 </Mean>>
-			<StdDev> 1.0 </StdDev>
+			<Gaussian>
+				<Mean> 20.0 </Mean>>
+				<StdDev> 2.0 </StdDev>
+			</Gaussian>
 		</InfectionSymptomsShow>
 		<InfectionDuration>
-			<Mean> 14.0 </Mean>>
-			<StdDev> 2.0 </StdDev>
+			<Gaussian>
+				<Mean> 14.0 </Mean>>
+				<StdDev> 2.0 </StdDev>
+			</Gaussian>
 		</InfectionDuration>
-		<Community name="Large">
-			<Fixed> 1 </Fixed>
-		</Community>
 		<Community name="Medium">
-			<Fixed> 1 </Fixed>
-		</Community>
-		<Community name="Small">
 			<Fixed> 1 </Fixed>
 		</Community>
 	</WorldConfiguration>
