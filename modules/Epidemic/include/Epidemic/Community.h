@@ -21,6 +21,7 @@ class Community
 public:
    using BuildingByTypeMap = std::unordered_map<CommunityType, std::vector<Building>>;
 
+   static void reset_static_counters();
    static CommunityId get_next_community_id();
    static CommunityType get_community_type_by_name(const std::string& name);
 

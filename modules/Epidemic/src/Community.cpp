@@ -10,6 +10,12 @@ Community::Community(BuildingByTypeMap buildings) : m_id(++uniqueCommunityId), m
 {
 }
 
+void Community::reset_static_counters()
+{
+   uniqueCommunityId = -1;
+   uniqueCommunityType = -1;
+}
+
 CommunityId Community::get_next_community_id()
 {
    return uniqueCommunityId + 1;

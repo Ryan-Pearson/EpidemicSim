@@ -25,8 +25,9 @@ public:
       Distance m_y = 0.0;
    };
 
-   static BuildingType get_building_type_by_name(const std::string& name);
+   static void reset_static_counters();
    static BuildingId get_next_building_id();
+   static BuildingType get_building_type_by_name(const std::string& name);
 
    explicit Building(const std::string& buildingName, const Position& maxPosition);
 

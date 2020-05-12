@@ -343,6 +343,18 @@ WorldConfiguration get_world_config_from_xml(const std::string& fullFilePath)
       throw std::runtime_error(fmt::format("Could not find XML Element ", WORLD_ROOT));
    }
 
+   const auto monteCarloNode = worldConfigNode.child("NumMonteCarloRuns");
+   if (monteCarloNode)
+   {
+      std::string monteCarloText = monteCarloNode.child_value();
+      boost::algorithm::trim(monteCarloText);
+      ret.m_numMonteCarloRuns = boost::lexical_cast<int>(monteCarloText);
+   }
+   else
+   {
+      throw std::runtime_error("Could not find XML Element NumMonteCarloRuns");
+   }
+
    const auto infectionSize = worldConfigNode.child("InitialInfectionSize");
    if (infectionSize)
    {

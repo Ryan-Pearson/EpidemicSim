@@ -232,6 +232,7 @@
 	</Communities>
 
 	<WorldConfiguration>
+		<NumMonteCarloRuns> 2 </NumMonteCarloRuns>
 		<InitialInfectionSize> 20 </InitialInfectionSize>
 		<InfectionSymptomsShow>
 			<Gaussian>

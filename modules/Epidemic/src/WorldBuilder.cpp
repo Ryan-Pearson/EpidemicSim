@@ -18,6 +18,11 @@ World build_world(const WorldConfiguration& worldConfiguration)
       const std::unordered_map<AgentType, Statistics::Distribution>* m_agents;
    };
 
+   // TODO: Fix this hack someday
+   Community::reset_static_counters();
+   Building::reset_static_counters();
+   Agent::reset_static_counters();
+
    std::vector<Community> communities;
    std::vector<Agent> agents;
    std::vector<BuildingSpawnInfo> agentsInBuildingToSpawn;

@@ -18,6 +18,12 @@ Building::Building(const std::string& buildingName, const Position& maxPosition)
 {
 }
 
+void Building::reset_static_counters()
+{
+   uniqueBuildingId = -1;
+   uniqueBuildingType = -1;
+}
+
 BuildingId get_next_building_id()
 {
    return uniqueBuildingId + 1;

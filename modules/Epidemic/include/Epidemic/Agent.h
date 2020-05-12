@@ -34,6 +34,7 @@ struct AgentMovementInfo
 class Agent
 {
 public:
+   static void reset_static_counters();
    static AgentType get_agent_type_by_name(const std::string& name);
 
    explicit Agent(Building* spawnLocation,

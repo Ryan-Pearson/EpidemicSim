@@ -57,6 +57,12 @@ Agent::Agent(Building* spawnLocation,
    m_nextMovementTime = (nextLocationIt != m_locations.cend()) ? nextLocationIt->first : 0;
 }
 
+void Agent::reset_static_counters()
+{
+   uniqueAgentId = -1;
+   uniqueAgentType = -1;
+}
+
 AgentType Agent::get_agent_type_by_name(const std::string& name)
 {
    auto it = s_typeByName.find(name);
