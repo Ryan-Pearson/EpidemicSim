@@ -17,9 +17,13 @@
 static const std::string SOURCE_DIR = BASE_DIR;
 static const std::string OUTPUT_ROOT = BASE_DIR + std::string("/output");
 constexpr std::optional<Epidemic::AgentId> AGENT_TO_LOG_DIAGNOSTICS = std::nullopt;
+constexpr bool VERBOSE_SCREEN_LOG = false;
 
 std::mutex cumulativeStatsMut;
 std::mutex coutMut;
+
+static int numComplete = 0;
+static int numTotal = 0;
 
 void handle_eptr(std::exception_ptr eptr)
 {
@@ -44,7 +48,8 @@ static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
 
    std::ofstream buildingLog;
    std::ofstream positionLog;
-   std::ofstream sirdLog(OUTPUT_ROOT + fmt::format("/sirdLog_{}.csv", repNumber));
+   const std::string fullFilePath = OUTPUT_ROOT + fmt::format("/sirdLog_{}.csv", repNumber);
+   std::ofstream sirdLog(fullFilePath);
    sirdLog << "Day,R_est,Susceptible,Infectious,Recovered,Deceased,Infectious,Susceptible+Infectious,"
               "Susceptible+Infectious+Recovered,Susceptible+Infectious+Recovered+Deceased\n";
 
@@ -58,9 +63,12 @@ static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
    }
 
    const auto logStats = [&](const int day, const double curR, const Epidemic::World::SIRD_Levels& stats) {
-      std::lock_guard<std::mutex> lock(coutMut);
-      std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}] R[{}]\n", day, stats.m_numSusceptible,
-         stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased, curR);
+      if (VERBOSE_SCREEN_LOG)
+      {
+         std::lock_guard<std::mutex> lock(coutMut);
+         std::cout << fmt::format("Day {}: S[{}] I[{}] R[{}] D[{}] R[{}]\n", day, stats.m_numSusceptible,
+            stats.m_numInfectious, stats.m_numRecovered, stats.m_numDeceased, curR);
+      }
       sirdLog << day << ',' << curR << ',' << stats.m_numSusceptible << ',' << stats.m_numInfectious << ','
               << stats.m_numRecovered << ',' << stats.m_numDeceased << ',' << stats.m_numInfectious << ','
               << stats.m_numSusceptible + stats.m_numInfectious << ','
@@ -106,6 +114,11 @@ static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
    const int dayEnd = curTime / Epidemic::TIMESTEP_PER_DAY;
    logStats(dayEnd, world.get_cur_R_level(), worldStats);
    cumulativeLog(dayEnd, worldStats);
+
+   {
+      std::lock_guard<std::mutex> lock(coutMut);
+      std::cout << "Completed " << ++numComplete << " out of " << numTotal;
+   }
 }
 
 int main()
@@ -176,9 +189,10 @@ int main()
       const int numThreadsToUse =
          std::min(worldConfiguration.m_numThreads, static_cast<int>(std::thread::hardware_concurrency()));
       boost::asio::thread_pool pool(numThreadsToUse);
-      for (int i = 0; i < worldConfiguration.m_numMonteCarloRuns; ++i)
+      numTotal = worldConfiguration.m_numMonteCarloRuns;
+      for (int i = 0; i < numTotal; ++i)
       {
-         boost::asio::post(pool, [&]() { perform_run(worldConfiguration, logCumulativeStats, i); });
+         boost::asio::post(pool, [=]() { perform_run(worldConfiguration, logCumulativeStats, i); });
       }
       pool.join();
 
