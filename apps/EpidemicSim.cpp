@@ -117,7 +117,7 @@ static void perform_run(const Epidemic::WorldConfiguration& worldConfiguration,
 
    {
       std::lock_guard<std::mutex> lock(coutMut);
-      std::cout << "Completed " << ++numComplete << " out of " << numTotal;
+      std::cout << "Completed " << ++numComplete << " out of " << numTotal << '\n';
    }
 }
 
