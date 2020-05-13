@@ -233,13 +233,13 @@
 	</Communities>
 
 	<WorldConfiguration>
-		<NumThreads> 6 </NumThreads>
-		<NumMonteCarloRuns> 6 </NumMonteCarloRuns>
-		<InitialInfectionSize> 20 </InitialInfectionSize>
+		<NumThreads> 64 </NumThreads>
+		<NumMonteCarloRuns> 512 </NumMonteCarloRuns>
+		<InitialInfectionSize> 200 </InitialInfectionSize>
 		<InfectionSymptomsShow>
 			<Gaussian>
-				<Mean> 10.0 </Mean>>
-				<StdDev> 0.75 </StdDev>
+				<Mean> 6.0 </Mean>>
+				<StdDev> 0.5 </StdDev>
 			</Gaussian>
 		</InfectionSymptomsShow>
 		<InfectionDuration>
