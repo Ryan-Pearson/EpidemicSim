@@ -238,14 +238,14 @@
 		<InitialInfectionSize> 20 </InitialInfectionSize>
 		<InfectionSymptomsShow>
 			<Gaussian>
-				<Mean> 20.0 </Mean>>
-				<StdDev> 2.0 </StdDev>
+				<Mean> 6.0 </Mean>>
+				<StdDev> 0.5 </StdDev>
 			</Gaussian>
 		</InfectionSymptomsShow>
 		<InfectionDuration>
 			<Gaussian>
-				<Mean> 6.0 </Mean>>
-				<StdDev> 0.5 </StdDev>
+				<Mean> 20.0 </Mean>>
+				<StdDev> 2.0 </StdDev>
 			</Gaussian>
 		</InfectionDuration>
 		<Community name="Medium">

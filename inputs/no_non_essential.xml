@@ -227,13 +227,13 @@
 		<InitialInfectionSize> 20 </InitialInfectionSize>
 		<InfectionSymptomsShow>
 			<Gaussian>
-				<Mean> 20.0 </Mean>>
+				<Mean> 14.0 </Mean>>
 				<StdDev> 2.0 </StdDev>
 			</Gaussian>
 		</InfectionSymptomsShow>
 		<InfectionDuration>
 			<Gaussian>
-				<Mean> 14.0 </Mean>>
+				<Mean> 20.0 </Mean>>
 				<StdDev> 2.0 </StdDev>
 			</Gaussian>
 		</InfectionDuration>

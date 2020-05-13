@@ -130,7 +130,7 @@ void Agent::update_agent_state(const Timestep curTimeStep)
 {
    if (const auto infectious = std::get_if<SirdState::Infectious>(&m_currentState))
    {
-      if (!m_quarantined)
+      if (!m_quarantined && (infectious->m_symptomsShow < curTimeStep))
       {
          m_quarantined = true;
       }
