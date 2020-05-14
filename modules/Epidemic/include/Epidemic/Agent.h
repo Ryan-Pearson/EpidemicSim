@@ -58,6 +58,7 @@ public:
 
 private:
    bool m_quarantined = false;
+   bool m_transitioningToQuarantine = false;
    SIRD m_currentState = SirdState::Susceptible {};
    Building* m_curBuilding;
    Timestep m_nextMovementTime = 0;

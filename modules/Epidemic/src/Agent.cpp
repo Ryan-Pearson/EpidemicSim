@@ -133,6 +133,7 @@ void Agent::update_agent_state(const Timestep curTimeStep)
       if (!m_quarantined && (infectious->m_symptomsShow < curTimeStep))
       {
          m_quarantined = true;
+         m_transitioningToQuarantine = true;
       }
       else if (infectious->m_infectionEndTime < curTimeStep)
       {
@@ -158,7 +159,7 @@ void Agent::move_agent(const Timestep curTimeStep)
 
    const auto timeOfDay = (curTimeStep % TIMESTEP_PER_DAY);
 
-   if (m_quarantined && m_curBuilding != m_spawnLocation)
+   if (m_transitioningToQuarantine)
    {
       if (const auto infectious = std::get_if<SirdState::Infectious>(&m_currentState))
       {
@@ -168,13 +169,14 @@ void Agent::move_agent(const Timestep curTimeStep)
          const auto endInfectionTod = (infectious->m_infectionEndTime % TIMESTEP_PER_DAY);
          const auto nextLocation = m_locations.lower_bound(endInfectionTod);
          m_nextMovementTime = (nextLocation == m_locations.cend()) ? 0 : nextLocation->first;
+         m_transitioningToQuarantine = false;
       }
       else
       {
          throw std::runtime_error("Quarantined but not infectious, how did we get here?");
       }
    }
-   else if (timeOfDay == m_nextMovementTime)
+   else if (!m_quarantined && (timeOfDay == m_nextMovementTime))
    {
       const auto locationInfo = m_locations.lower_bound(timeOfDay);
       const auto nextLocationIdx = Statistics::sample_distribution(locationInfo->second.m_locationIdx);
